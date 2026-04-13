@@ -1,7 +1,10 @@
 import CliniDeskLogo from './CliniDeskLogo';
 import { FaUser, FaLock } from "react-icons/fa";
 import { Calendar, Shield, MessageCircle } from "lucide-react";
-import "./Login.css";
+import "../../styles/Login.css";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Checkbox } from "@/Components/ui/checkbox";
 
 const Login = () => {
   return (
