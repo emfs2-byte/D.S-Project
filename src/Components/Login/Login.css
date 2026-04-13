@@ -1,0 +1,90 @@
+/* RESET BÁSICO */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial;
+}
+
+/* DIVISÃO DA TELA */
+.main {
+  display: flex;
+  height: 100vh;
+}
+
+/* LADO ESQUERDO */
+.left {
+  flex: 1;
+  background: linear-gradient(135deg, #001a3d 0%, #0061f2 50%, #20c997 100%);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+}
+
+.left h1 {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.features p {
+  margin-top: 15px;
+}
+
+/* LADO DIREITO */
+.right {
+  flex: 1;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* FORM */
+.container {
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* INPUT COM ÍCONE */
+.input-box {
+  position: relative;
+}
+
+.input-box input {
+  width: 100%;
+  padding: 10px 35px 10px 10px;
+}
+
+.icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* CHECKBOX + LINK */
+.recall-forget {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+/* BOTÃO */
+button {
+  padding: 10px;
+  border: none;
+  background: linear-gradient(135deg, #001a3d 0%, #0061f2 50%, #20c997 100%);
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* LINK CADASTRO */
+.signup-link {
+  text-align: center;
+  font-size: 14px;
+}
