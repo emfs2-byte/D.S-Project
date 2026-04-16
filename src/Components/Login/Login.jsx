@@ -54,47 +54,51 @@ const Login = () => {
             <p>Faça login para acessar o painel</p>
           </div>
 
-          <div className="input-group-custom">
-            <label className="field-label-tiny">INICIAIS DO USUÁRIO</label>
-            <div className="input-box-custom">
-              <FaUser className="left-icon-custom" />
-              <Input type="text" placeholder="Ex: abcd" required />
+          <div className="space-y-5">
+            {/* INICIAIS */}
+            <div>
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Iniciais do Usuário</label>
+              <div className="relative">
+                <FaUser className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+                <input type="text" placeholder="ex: abcd" className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-4 outline-none focus:ring-2 focus:ring-cyan-100 transition-all text-slate-600" />
+              </div>
+            </div>
+
+            {/* SENHA */}
+            <div>
+              <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Senha</label>
+              <div className="relative">
+                <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+                <input type="password" placeholder="••••••" className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-12 outline-none focus:ring-2 focus:ring-cyan-100 transition-all text-slate-600" />
+                <FaRegEye className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 cursor-pointer hover:text-cyan-500" />
+              </div>
             </div>
           </div>
 
-          <div className="input-group-custom">
-            <label className="field-label-tiny">SENHA</label>
-            <div className="input-box-custom">
-              <FaLock className="left-icon-custom" />
-              <Input type="password" placeholder="******" required />
-              <FaRegEye className="eye-custom" />
+          {/* CHECKBOX E ESQUECI SENHA */}
+          <div className="flex justify-between items-center mt-6 mb-8">
+            <div className="flex items-center gap-2 cursor-pointer group" onClick={() => setLembrar(!lembrar)}>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${lembrar ? 'border-cyan-500 bg-cyan-500' : 'border-slate-200'}`}>
+                {lembrar && <div className="w-2 h-2 bg-white rounded-full" />}
+              </div>
+              <span className="text-sm text-slate-500 font-medium group-hover:text-slate-700">Lembrar de mim</span>
             </div>
+            <a href="#" className="text-sm text-cyan-500 font-bold hover:underline">Esqueci minha senha</a>
           </div>
 
-          <div className="recall-forget">
-            <div className="remember-me" onClick={handleRadioClick}>
-              <input 
-                type="radio" 
-                id="remember" 
-                name="remember" 
-                className="radio-custom"
-                checked={lembrar}
-                readOnly
-              />
-              <label htmlFor="remember" onClick={(e) => e.preventDefault()}>
-                Lembrar de mim
-              </label>
-            </div>
-            <a href="#" className="forgot-password">Esqueci minha senha</a>
+          {/* BOTÃO */}
+          <button className="login-button">
+            Entrar
+          </button>
+
+          {/* CRIAR CONTA */}
+          <div className="text-center mt-8">
+            <span className="text-sm text-slate-400">Não tem uma conta? </span>
+            <a href="#" className="text-sm text-cyan-500 font-bold hover:underline">Criar conta</a>
           </div>
 
-          <Button type="submit" className="btn-entrar btn-custom">Entrar</Button>
-
-          <div className="signup-link">
-            <p>Não tem uma conta? <a href="#">Criar conta</a></p>
-          </div>
-
-          <div className="footer-credits-custom">
+          {/* FOOTER */}
+          <div className="mt-12 text-center text-[10px] text-slate-300 uppercase tracking-widest font-bold">
             <p>CliniDesk v1.0.0 — Sistema de Gestão Clínica</p>
           </div>
         </form>
