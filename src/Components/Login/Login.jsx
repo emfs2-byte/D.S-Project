@@ -3,20 +3,29 @@ import CliniDeskLogo from './CliniDeskLogo';
 import { FaUser, FaLock, FaRegEye } from "react-icons/fa";
 import { Calendar, Shield, MessageCircle } from "lucide-react";
 import "../../styles/Login.css";
-import { Button } from "@/Components/ui/button";
-import { Input } from "@/Components/ui/input";
+
+// AJUSTE: Caminhos relativos para evitar erro de tela branca
+import { Button } from "../ui/button"; 
+import { Input } from "../ui/input";
+
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  // Lógica para permitir que o radio seja desmarcado
+  const navigate = useNavigate();
   const [lembrar, setLembrar] = useState(false);
 
   const handleRadioClick = () => {
     setLembrar(!lembrar);
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault(); 
+    // Redireciona para a rota /home definida no App.jsx
+    navigate("/home"); 
+  };
+
   return (
     <div className="main">
-      {/* LADO AZUL */}
       <div className="left">
         <CliniDeskLogo />
         <div className="features">
@@ -35,14 +44,12 @@ const Login = () => {
         </div>
       </div>
 
-      {/* LADO BRANCO */}
       <div className="right">
-        <form className="container container-custom" onSubmit={(e) => e.preventDefault()}>
+        <form className="container container-custom" onSubmit={handleSubmit}>
           <div className="form-header">
             <div className="logo-form-header">
               <CliniDeskLogo />
             </div>
-            
             <h1>Bem-vindo ao CliniDesk</h1>
             <p>Faça login para acessar o painel</p>
           </div>
@@ -89,7 +96,6 @@ const Login = () => {
 
           <div className="footer-credits-custom">
             <p>CliniDesk v1.0.0 — Sistema de Gestão Clínica</p>
-            <p>Acesso restrito a profissionais autorizados</p>
           </div>
         </form>
       </div>
