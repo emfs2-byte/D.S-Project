@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Calendar as CalendarIcon, Settings, Plus, LogOut, Menu, CheckCircle2, ChevronDown, Clock, Printer, Send, XCircle } from 'lucide-react';
+import { Search, Calendar as CalendarIcon, Settings, Plus, LogOut, Menu, CheckCircle2, ChevronDown, Clock, Printer, Send, XCircle,CalendarClock, 
+  Pencil, Ban } from 'lucide-react';
+import CliniDeskLogo from "../Components/Login/CliniDeskLogo";
 import ModalNovoAgendamento from '../Components/Modals/ModalNovoAgendamento';
 import ModalGerenciarClinicas from '../Components/Modals/ModalGerenciarClinicas';
 import '../styles/Dashboard.css'; 
@@ -264,31 +266,37 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <div className="brand-group">
-          <Menu className="text-slate-500 cursor-pointer hover:text-slate-800" size={24} />
-          <div className="flex items-center gap-3">
-            <div className="logo-circle"><span className="logo-letter">C</span></div>
-            <div className="brand-text">
-              <h1 className="brand-name">CliniDesk</h1>
-              <span className="brand-tagline">Sua recepção, no controle</span>
-            </div>
+          {/* Menu Icone (Lucide) */}
+          <Menu size={24} className="menu-handle" />
+
+          <div style={{ 
+            transform: 'scale(0.55)', 
+            transformOrigin: 'left center', 
+            marginBottom: '-25px', // Ajusta o respiro vertical
+            marginTop: '-15px'     // Sobe um pouco para alinhar com o menu
+          }}>
+            <CliniDeskLogo isFormHeader={true} />
           </div>
+      
         </div>
         <div className="user-actions">
           <div className="user-avatar">HJBC</div>
-          <Settings className="text-slate-400 cursor-pointer hover:rotate-90 transition-transform duration-300" size={20} />
+          {/* Settings Icon (Lucide) */}
+          <Settings size={20} className="user-settings-icon" />
           <div className="logout-button"><LogOut size={18} /><span>Sair</span></div>
         </div>
       </header>
 
+      {/* --- LINHA DE TÍTULO E BOTÕES --- */}
       <div className="main-actions-row">
-        <div>
+        <div className="title-section">
           <div className="title-with-badge">
-            <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Consultas do Dia — CliniDesk</h2>
+            <h1 className="brand-title">Consultas do Dia — CliniDesk</h1>
             <div className="count-badge">{consultasFiltradas.length}</div>
           </div>
-          <p className="text-slate-400 mt-2 font-semibold capitalize">
+          <h2 className="brand-subtitle">
             {format(dataSelecionada, "eeee, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-          </p>
+          </h2>
         </div>
         <div className="action-buttons">
           <button onClick={() => setIsModalClinicasOpen(true)} className="btn-clinicas">
@@ -300,56 +308,45 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* --- BARRA DE FILTROS (Correção de Layout) --- */}
       <div className="filter-bar">
         <div className="search-input-group">
-          <Search className="text-slate-400" size={20} />
+          <Search size={20} />
           <input type="text" placeholder="Buscar por paciente ou telefone..." />
         </div>
 
-        <div className="search-input-group date-picker-container" style={{ width: '224px', flex: 'none' }}>
-          <CalendarIcon className="text-sky-500" size={20} />
+        <div className="search-input-group date-picker-container" style={{ width: '200px' }}>
+          <CalendarIcon size={20} />
           <DatePicker
             selected={dataSelecionada}
             onChange={(date) => setDataSelecionada(date)}
             locale="pt-BR"
             dateFormat="dd/MM/yyyy"
-            className="datepicker-input" 
-            popperPlacement="bottom-end"
+            className="datepicker-input"
           />
         </div>
         
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative" ref={dropdownRef} style={{ width: '200px' }}>
           <div 
-            className="search-input-group cursor-pointer hover:bg-slate-100 transition-colors" 
-            style={{ width: '256px', flex: 'none', justifyContent: 'space-between' }}
+            className="search-input-group cursor-pointer trigger-setor" 
             onClick={() => setIsSelectSetorOpen(!isSelectSetorOpen)}
           >
-            <span className="text-sm font-bold text-slate-700">{setorSelecionado}</span>
-            <ChevronDown size={14} className={`text-slate-400 transition-transform ${isSelectSetorOpen ? 'rotate-180' : ''}`} />
+            <span>{setorSelecionado}</span>
+            <ChevronDown size={14} />
           </div>
 
           {isSelectSetorOpen && (
-            <div className="absolute top-full right-0 mt-2 w-full bg-white border border-slate-100 rounded-xl shadow-xl z-50 overflow-hidden py-1">
-              <div 
-                className={`px-4 py-2.5 text-sm cursor-pointer hover:bg-sky-50 hover:text-sky-600 transition-colors ${setorSelecionado === 'Todos os setores' ? 'bg-sky-50 text-sky-600 font-bold' : 'text-slate-600'}`}
-                onClick={() => { setSetorSelecionado('Todos os setores'); setIsSelectSetorOpen(false); }}
-              >
-                Todos os setores
-              </div>
+            <div className="dropdown-menu-setor">
+              <div onClick={() => { setSetorSelecionado('Todos os setores'); setIsSelectSetorOpen(false); }}>Todos os setores</div>
               {clinicas.map((clinica, idx) => (
-                <div 
-                  key={idx}
-                  className={`px-4 py-2.5 text-sm cursor-pointer hover:bg-sky-50 hover:text-sky-600 transition-colors ${setorSelecionado === clinica.nome ? 'bg-sky-50 text-sky-600 font-bold' : 'text-slate-600'}`}
-                  onClick={() => { setSetorSelecionado(clinica.nome); setIsSelectSetorOpen(false); }}
-                >
-                  {clinica.nome}
-                </div>
+                <div key={idx} onClick={() => { setSetorSelecionado(clinica.nome); setIsSelectSetorOpen(false); }}>{clinica.nome}</div>
               ))}
             </div>
           )}
         </div>
       </div>
 
+      {/* --- TABELA DE CONSULTAS (Fiel à referência) --- */}
       <div className="table-container">
         <div className="table-header">
           <div>PACIENTE</div>
@@ -357,90 +354,85 @@ const Dashboard = () => {
           <div>CONTATOS</div>
           <div>SETOR</div>
           <div>HORÁRIO</div>
-          <div>STATUS</div>
-          <div className="text-right">AÇÕES</div>
+          <div style={{textAlign: 'center'}}>STATUS</div>
+          <div style={{textAlign: 'center'}}>AÇÕES</div>
         </div>
 
         {consultasFiltradas.length === 0 ? (
-          <div className="py-24 flex flex-col items-center justify-center opacity-40">
-            <Search size={48} className="mb-4" />
-            <p className="text-slate-500 text-sm font-bold italic">Nenhuma consulta encontrada para este filtro.</p>
+          <div className="empty-state">
+            <Search size={48} />
+            <p>Nenhuma consulta encontrada para este filtro.</p>
           </div>
         ) : (
           consultasFiltradas.map((item, index) => {
             const horarioColor = getHorarioColor(item.data, item.horario);
-            const usuarioLogado = "HJBC";
             const consultaOriginalIndex = consultas.findIndex(c => c === item);
             
             return (
               <div key={index} className="table-row group">
-                <div className="text-slate-900 font-extrabold truncate">{item.paciente}</div>
-                <div className="text-slate-500 font-semibold truncate">{item.responsavel}</div>
-                <div className="text-slate-400 text-[11px] font-bold flex flex-col leading-tight">
+                <div className="patient-name">{item.paciente}</div>
+                <div className="resp-name">{item.responsavel}</div>
+                <div className="contacts-cell">
                   <span>{item.telPaciente}</span>
-                  <span className="opacity-60">{item.telResponsavel}</span>
+                  <span className="sub-contact">{item.telResponsavel}</span>
                 </div>
-                <div className="flex items-center">
-                  <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black border border-emerald-100 uppercase">
-                    {item.setor}
-                  </span>
+                <div><span className="sector-badge">{item.setor}</span></div>
+                <div><span className={`time-badge ${horarioColor}`}>{item.horario}</span></div>
+                
+                {/* --- MUDANÇA AQUI: ÍCONE DE CHECK MARK --- */}
+                <div className="status-cell">
+                  <button
+                    onClick={() => toggleLembrete(consultaOriginalIndex, "HJBC")}
+                    className={`status-circle ${item.lembreteEnviadoPor ? 'status-circle-enviado' : 'status-circle-pendente'}`}
+                    title={item.lembreteEnviadoPor ? "Desmarcar lembrete" : "Marcar como enviado"}
+                  >
+                    {/* Ícone único: a cor e o fundo serão controlados pelo CSS via classes */}
+                    <CheckCircle2 size={18} strokeWidth={3}/>
+                  </button>
                 </div>
                 
-                {/* HORÁRIO COM COR DINÂMICA CORRIGIDA */}
-                <div className="flex items-center">
-                  <div className={`time-badge ${horarioColor}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${
-                      horarioColor === 'horario-atrasado' ? 'bg-red-500' : 
-                      horarioColor === 'horario-proximo' ? 'bg-yellow-500' : 'bg-blue-500'
-                    }`}></span>
-                    {item.horario}
-                  </div>
-                </div>
-                
-                {/* 🔧 CORREÇÃO 3: STATUS COM ESTILO IGUAL À IMAGEM */}
-                <div className="flex justify-center items-center">
-                  {item.lembreteEnviadoPor ? (
-                    <button
-                      onClick={() => toggleLembrete(consultaOriginalIndex, usuarioLogado)}
-                      className="status-circle status-circle-enviado"
-                      title="Desmarcar lembrete"
-                    >
-                      <CheckCircle2 size={16} />
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => toggleLembrete(consultaOriginalIndex, usuarioLogado)}
-                      className="status-circle status-circle-pendente"
-                      title="Enviar lembrete"
-                    >
-                      <Send size={14} />
-                    </button>
-                  )}
-                </div>
-                
-                {/* AÇÕES */}
                 <div className="actions-cell">
+                    {/* 1. REAGENDAR (Novo) */}
+                  <button 
+                    className="btn-action" 
+                    title="Reagendar"
+                    onClick={() => console.log("Abrir modal de reagendamento")}
+                  >
+                    <CalendarClock size={15} />
+                  </button>
+
+                  {/* 2. EDITAR (Novo) */}
+                  <button 
+                    className="btn-action" 
+                    title="Editar dados"
+                    onClick={() => console.log("Abrir modal de edição")}
+                  >
+                    <Pencil size={15} />
+                  </button>
+
+                  {/* 3. WHATSAPP (Já existia) */}
                   <button 
                     className="btn-action btn-whatsapp"
                     onClick={() => alert(`WhatsApp para ${item.paciente}: ${item.telResponsavel}`)}
                   >
                     <FaWhatsapp size={16} />
                   </button>
+
+                  {/* 4. IMPRIMIR (Já existia) */}
                   <button 
                     className="btn-action btn-print"
                     onClick={() => imprimirTicket(item)}
                   >
                     <Printer size={14} />
                   </button>
+
+                  {/* 5. CANCELAR (Troquei o FaTrash pelo Ban para ficar mais "clínico") */}
                   <button
                     className="btn-action btn-delete"
-                    onClick={() => {
-                      if(window.confirm(`Excluir consulta de ${item.paciente}?`)) {
-                        setConsultas(consultas.filter((c) => c !== item));
-                      }
-                    }}
+                    title="Cancelar Consulta"
+                    onClick={() => {/* função de deletar */}}
                   >
-                    <FaTrash size={14} />
+                    <Ban size={15} />
                   </button>
                 </div>
               </div>
@@ -449,6 +441,7 @@ const Dashboard = () => {
         )}
       </div>
 
+      {/* --- MODAIS (Mantenha aqui) --- */}
       {isModalNovoOpen && (
         <ModalNovoAgendamento
           onClose={() => setIsModalNovoOpen(false)}
@@ -470,5 +463,4 @@ const Dashboard = () => {
     </div>
   );
 };
-
 export default Dashboard;
