@@ -303,3 +303,100 @@ display: flex;
   justify-content: center;
   align-items: center; }
 .text-right { text-align: right; }
+
+.empty-state {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #64748b; /* Um cinza azulado mais elegante */
+  gap: 12px;
+}
+
+
+.empty-state svg {
+  color: #0061f2;
+  opacity: 0.6; 
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* EFEITOS NOS BOTOES DE "CLINICAS" E "NOVO" */
+.btn-clinicas, .btn-novo {
+  transition: all 0.2s ease; /* Faz a mágica acontecer suavemente */
+  cursor: pointer;
+}
+
+/* Quando o mouse passa por cima (Hover) */
+.btn-clinicas:hover, .btn-novo:hover {
+  transform: translateY(-2px); /* Sobe 2 pixels */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Sombra mais forte */
+}
+
+/* Quando você clica (Active) */
+.btn-clinicas:active, .btn-novo:active {
+  transform: translateY(0); /* Volta para o lugar */
+  transform: scale(0.96); /* Dá um leve "aperto" */
+}
+
+.btn-novo:hover {
+  background-color: #009dff; /* Um azul levemente mais claro */
+  filter: brightness(1.1);
+}
+
+.btn-clinicas:hover svg {
+  transform: rotate(45deg);
+  transition: transform 0.3s ease;
+}
+
+/* ACABA AQUI*/
+
+/* --- AJUSTE DO DROPDOWN PARA NÃO MOVER O LAYOUT --- */
+
+/* 1. Garante que o container do setor seja a referência */
+.relative {
+  position: relative;
+}
+
+/* 2. Faz o menu flutuar sobre os outros elementos */
+.dropdown-menu-setor {
+  position: absolute;      /* Essencial: sai do fluxo do layout */
+  top: 100%;               /* Brota logo abaixo do botão */
+  left: 0;
+  width: 100%;             /* Mantém a largura do campo */
+  z-index: 9999;           /* Fica na frente de qualquer outro item */
+  
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  margin-top: 5px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Sombra para parecer flutuante */
+  
+  max-height: 250px;       /* Evita que a lista suma da tela */
+  overflow-y: auto;        /* Scroll se tiver muitas clínicas */
+}
+
+/* 3. Estilo dos itens dentro do menu para combinar com seu Dashboard */
+.dropdown-menu-setor div {
+  padding: 10px 15px;
+  font-size: 0.9rem;
+  color: #475569;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dropdown-menu-setor div:hover {
+  background-color: #f1f5f9;
+  color: #0ea5e9;
+}
+
+/* 4. Trava a altura da filter-bar para não oscilar */
+.filter-bar {
+  align-items: center !important; /* Mantém busca e data alinhados no meio */
+  overflow: visible !important;   /* Permite que o menu "saia" da barra branca */
+}

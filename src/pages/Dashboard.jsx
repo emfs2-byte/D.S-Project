@@ -360,7 +360,7 @@ const Dashboard = () => {
 
         {consultasFiltradas.length === 0 ? (
           <div className="empty-state">
-            <Search size={48} />
+            <Search size={24} />
             <p>Nenhuma consulta encontrada para este filtro.</p>
           </div>
         ) : (
