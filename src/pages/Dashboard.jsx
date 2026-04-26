@@ -1,26 +1,37 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Calendar as CalendarIcon, Settings, Plus, LogOut, Menu, CheckCircle2, ChevronDown, Clock, Printer, Send, XCircle,CalendarClock, 
-  Pencil, Ban } from 'lucide-react';
+import {
+  Search, Calendar as CalendarIcon, Settings, Plus, LogOut, Menu, CheckCircle2, ChevronDown, Clock, Printer, Send, XCircle, CalendarClock,
+  Pencil, Ban, User
+} from 'lucide-react'; // Adicionado User e XCircle
 import CliniDeskLogo from "../Components/Login/CliniDeskLogo";
 import ModalNovoAgendamento from '../Components/Modals/ModalNovoAgendamento';
 import ModalGerenciarClinicas from '../Components/Modals/ModalGerenciarClinicas';
-import '../styles/Dashboard.css'; 
+import '../styles/Dashboard.css';
 import { FaWhatsapp, FaPrint, FaTrash } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import { registerLocale } from "react-datepicker";
 import ptBR from 'date-fns/locale/pt-BR';
 import "react-datepicker/dist/react-datepicker.css";
 import { format, parseISO, differenceInMinutes, isAfter, isSameDay, setHours, setMinutes } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
+import ModalPerfil from '../Components/Modals/ModalPerfil';
 
 registerLocale('pt-BR', ptBR);
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isModalNovoOpen, setIsModalNovoOpen] = useState(false);
   const [isModalClinicasOpen, setIsModalClinicasOpen] = useState(false);
-  
+  const [isModalPerfilOpen, setIsModalPerfilOpen] = useState(false);
   const [isSelectSetorOpen, setIsSelectSetorOpen] = useState(false);
   const [setorSelecionado, setSetorSelecionado] = useState('Todos os setores');
   const dropdownRef = useRef(null);
+
+  // Função para deslogar
+  const handleLogout = () => {
+    navigate('/');
+  };
 
   const [consultas, setConsultas] = useState([
     {
@@ -65,184 +76,57 @@ const Dashboard = () => {
     { nome: "Geriatria", fixa: true },
     { nome: "Clínica Médica", fixa: true },
     { nome: "Enfermagem", fixa: true },
-    { nome: "Nutrição", fixa: true }, 
-    { nome: "Psicologia", fixa: true }, 
-    { nome: "Serviço Social", fixa: true }, 
-    { nome: "Fisioterapia", fixa: true }, 
+    { nome: "Nutrição", fixa: true },
+    { nome: "Psicologia", fixa: true },
+    { nome: "Serviço Social", fixa: true },
+    { nome: "Fisioterapia", fixa: true },
     { nome: "Terapia Ocupacional", fixa: true },
-    { nome: "Fonoaudiologia", fixa: true }, 
+    { nome: "Fonoaudiologia", fixa: true },
     { nome: "Odonto", fixa: true }
   ]);
 
   const [dataSelecionada, setDataSelecionada] = useState(new Date());
 
-  // 🔧 CORREÇÃO 1: FUNÇÃO CORRIGIDA PARA CORES DO HORÁRIO
   const getHorarioColor = (dataConsulta, horarioConsulta) => {
-    // Converte a data da consulta para objeto Date
     const [ano, mes, dia] = dataConsulta.split('-');
     const [hora, minuto] = horarioConsulta.split(':');
-    
-    // Cria a data/hora COMPLETA da consulta
     const dataHoraConsulta = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia), parseInt(hora), parseInt(minuto));
-    
-    // Data/hora atual
     const agora = new Date();
-    
-    // Calcula diferença em minutos
     const diferencaMinutos = differenceInMinutes(dataHoraConsulta, agora);
-    
-    // 🔴 VERMELHO: Já passou do horário
-    if (diferencaMinutos < 0) {
-      return 'horario-atrasado';
-    } 
-    // 🟡 AMARELO: Menos de 60 minutos (1 hora)
-    else if (diferencaMinutos <= 60) {
-      return 'horario-proximo';
-    } 
-    // 🔵 AZUL: Mais de 60 minutos
-    else {
-      return 'horario-normal';
-    }
+
+    if (diferencaMinutos < 0) return 'horario-atrasado';
+    else if (diferencaMinutos <= 60) return 'horario-proximo';
+    else return 'horario-normal';
   };
 
-  // 🔧 CORREÇÃO 2: FUNÇÃO PARA ENVIAR/DESMARCAR LEMBRETE
   const toggleLembrete = (index, nomeUsuario) => {
     const novasConsultas = [...consultas];
     const consulta = novasConsultas[index];
-    
+
     if (consulta.lembreteEnviadoPor) {
-      // DESMARCAR - sem confirmação, sem alerta
       consulta.lembreteEnviadoPor = null;
       consulta.lembreteEnviadoEm = null;
-      setConsultas(novasConsultas);
     } else {
-      // MARCAR - sem alerta
       consulta.lembreteEnviadoPor = nomeUsuario;
       consulta.lembreteEnviadoEm = new Date().toLocaleString();
-      setConsultas(novasConsultas);
     }
+    setConsultas(novasConsultas);
   };
 
-  // FUNÇÃO PARA IMPRIMIR TICKET
   const imprimirTicket = (consulta) => {
     const dataFormatada = format(new Date(consulta.data), 'dd/MM/yyyy');
-    
     const conteudoTicket = `
-      <!DOCTYPE html>
       <html>
-      <head>
-        <meta charset="UTF-8">
-        <title>Lembrete de Consulta - CliniDesk</title>
-        <style>
-          * { margin: 0; padding: 0; box-sizing: border-box; }
-          body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: #f5f5f5;
-          }
-          .ticket {
-            max-width: 400px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            overflow: hidden;
-          }
-          .ticket-header {
-            background: linear-gradient(135deg, #0061f2 0%, #0091ff 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-          }
-          .ticket-header h1 {
-            margin: 0;
-            font-size: 24px;
-          }
-          .ticket-header p {
-            margin: 5px 0 0;
-            opacity: 0.9;
-          }
-          .ticket-body {
-            padding: 20px;
-          }
-          .info-row {
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-          }
-          .info-label {
-            font-size: 12px;
-            color: #666;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin-bottom: 5px;
-          }
-          .info-value {
-            font-size: 16px;
-            color: #333;
-            font-weight: 500;
-          }
-          .ticket-footer {
-            background: #f8f9fa;
-            padding: 15px;
-            text-align: center;
-            font-size: 10px;
-            color: #666;
-            border-top: 1px solid #eee;
-          }
-          @media print {
-            body { background: white; padding: 0; }
-            .ticket { box-shadow: none; margin: 0; }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="ticket">
-          <div class="ticket-header">
-            <h1>CliniDesk</h1>
-            <p>Lembrete de Consulta</p>
-          </div>
-          <div class="ticket-body">
-            <div class="info-row">
-              <div class="info-label">PACIENTE</div>
-              <div class="info-value">${consulta.paciente}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">DATA</div>
-              <div class="info-value">${dataFormatada}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">HORÁRIO</div>
-              <div class="info-value">${consulta.horario}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">SETOR</div>
-              <div class="info-value">${consulta.setor}</div>
-            </div>
-            <div class="info-row">
-              <div class="info-label">RESPONSÁVEL</div>
-              <div class="info-value">${consulta.responsavel}</div>
-            </div>
-          </div>
-          <div class="ticket-footer">
-            Documento gerado pelo CliniDesk — Sistema de Gestão Clínica
-          </div>
-        </div>
-        <script>
-          window.print();
-          setTimeout(() => { window.close(); }, 100);
-        </script>
-      </body>
+        <body onload="window.print(); window.close();">
+          <h1>CliniDesk</h1>
+          <p>Paciente: ${consulta.paciente}</p>
+          <p>Data: ${dataFormatada} - ${consulta.horario}</p>
+        </body>
       </html>
     `;
-    
-    const janelaImpressao = window.open('', '_blank');
-    janelaImpressao.document.write(conteudoTicket);
-    janelaImpressao.document.close();
+    const janela = window.open('', '_blank');
+    janela.document.write(conteudoTicket);
+    janela.document.close();
   };
 
   useEffect(() => {
@@ -264,26 +148,76 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
+
+      {/* --- MENU LATERAL (SIDEBAR) --- */}
+      <div
+        className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`}
+        onClick={() => setIsSidebarOpen(false)}
+      >
+        <aside
+          className={`sidebar-menu ${isSidebarOpen ? 'open' : ''}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="sidebar-header">
+            <div className="user-info-sidebar">
+              <div className="user-avatar-large">HJ</div>
+              <div>
+                <h3>HJBC</h3>
+                <p>CliniDesk • Recepcionista</p>
+              </div>
+            </div>
+            <button className="close-sidebar" onClick={() => setIsSidebarOpen(false)}>
+              <XCircle size={24} />
+            </button>
+          </div>
+
+          <nav className="sidebar-nav">
+            <button
+              className="nav-item active"
+              onClick={() => {
+                setIsModalPerfilOpen(true);
+                setIsSidebarOpen(false); // Fecha a sidebar ao abrir o modal
+              }}
+            >
+              <User size={18} /> Perfil
+            </button>
+            <button className="nav-item">
+              <Settings size={18} /> Configurações
+            </button>
+          </nav>
+
+          <button className="sidebar-logout" onClick={handleLogout}>
+            <LogOut size={18} /> Sair
+          </button>
+        </aside>
+      </div>
+
       <header className="dashboard-header">
         <div className="brand-group">
-          {/* Menu Icone (Lucide) */}
-          <Menu size={24} className="menu-handle" />
+          {/* Menu Icone que abre o Sidebar */}
+          <Menu
+            size={24}
+            className="menu-handle"
+            onClick={() => setIsSidebarOpen(true)}
+            style={{ cursor: 'pointer' }}
+          />
 
-          <div style={{ 
-            transform: 'scale(0.55)', 
-            transformOrigin: 'left center', 
-            marginBottom: '-25px', // Ajusta o respiro vertical
-            marginTop: '-15px'     // Sobe um pouco para alinhar com o menu
+          <div style={{
+            transform: 'scale(0.55)',
+            transformOrigin: 'left center',
+            marginBottom: '-25px',
+            marginTop: '-15px'
           }}>
             <CliniDeskLogo isFormHeader={true} />
           </div>
-      
         </div>
+
         <div className="user-actions">
           <div className="user-avatar">HJBC</div>
-          {/* Settings Icon (Lucide) */}
-          <Settings size={20} className="user-settings-icon" />
-          <div className="logout-button"><LogOut size={18} /><span>Sair</span></div>
+          {/* Botão Sair com funcionalidade */}
+          <div className="logout-button" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+            <LogOut size={18} /><span>Sair</span>
+          </div>
         </div>
       </header>
 
@@ -308,7 +242,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* --- BARRA DE FILTROS (Correção de Layout) --- */}
+      {/* --- BARRA DE FILTROS --- */}
       <div className="filter-bar">
         <div className="search-input-group">
           <Search size={20} />
@@ -325,10 +259,10 @@ const Dashboard = () => {
             className="datepicker-input"
           />
         </div>
-        
+
         <div className="relative" ref={dropdownRef} style={{ width: '200px' }}>
-          <div 
-            className="search-input-group cursor-pointer trigger-setor" 
+          <div
+            className="search-input-group cursor-pointer trigger-setor"
             onClick={() => setIsSelectSetorOpen(!isSelectSetorOpen)}
           >
             <span>{setorSelecionado}</span>
@@ -346,7 +280,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* --- TABELA DE CONSULTAS (Fiel à referência) --- */}
+      {/* --- TABELA DE CONSULTAS --- */}
       <div className="table-container">
         <div className="table-header">
           <div>PACIENTE</div>
@@ -354,8 +288,8 @@ const Dashboard = () => {
           <div>CONTATOS</div>
           <div>SETOR</div>
           <div>HORÁRIO</div>
-          <div style={{textAlign: 'center'}}>STATUS</div>
-          <div style={{textAlign: 'center'}}>AÇÕES</div>
+          <div style={{ textAlign: 'center' }}>STATUS</div>
+          <div style={{ textAlign: 'center' }}>AÇÕES</div>
         </div>
 
         {consultasFiltradas.length === 0 ? (
@@ -367,7 +301,7 @@ const Dashboard = () => {
           consultasFiltradas.map((item, index) => {
             const horarioColor = getHorarioColor(item.data, item.horario);
             const consultaOriginalIndex = consultas.findIndex(c => c === item);
-            
+
             return (
               <div key={index} className="table-row group">
                 <div className="patient-name">{item.paciente}</div>
@@ -378,62 +312,23 @@ const Dashboard = () => {
                 </div>
                 <div><span className="sector-badge">{item.setor}</span></div>
                 <div><span className={`time-badge ${horarioColor}`}>{item.horario}</span></div>
-                
-                {/* --- MUDANÇA AQUI: ÍCONE DE CHECK MARK --- */}
+
                 <div className="status-cell">
                   <button
                     onClick={() => toggleLembrete(consultaOriginalIndex, "HJBC")}
                     className={`status-circle ${item.lembreteEnviadoPor ? 'status-circle-enviado' : 'status-circle-pendente'}`}
                     title={item.lembreteEnviadoPor ? "Desmarcar lembrete" : "Marcar como enviado"}
                   >
-                    {/* Ícone único: a cor e o fundo serão controlados pelo CSS via classes */}
-                    <CheckCircle2 size={18} strokeWidth={3}/>
+                    <CheckCircle2 size={18} strokeWidth={3} />
                   </button>
                 </div>
-                
+
                 <div className="actions-cell">
-                    {/* 1. REAGENDAR (Novo) */}
-                  <button 
-                    className="btn-action" 
-                    title="Reagendar"
-                    onClick={() => console.log("Abrir modal de reagendamento")}
-                  >
-                    <CalendarClock size={15} />
-                  </button>
-
-                  {/* 2. EDITAR (Novo) */}
-                  <button 
-                    className="btn-action" 
-                    title="Editar dados"
-                    onClick={() => console.log("Abrir modal de edição")}
-                  >
-                    <Pencil size={15} />
-                  </button>
-
-                  {/* 3. WHATSAPP (Já existia) */}
-                  <button 
-                    className="btn-action btn-whatsapp"
-                    onClick={() => alert(`WhatsApp para ${item.paciente}: ${item.telResponsavel}`)}
-                  >
-                    <FaWhatsapp size={16} />
-                  </button>
-
-                  {/* 4. IMPRIMIR (Já existia) */}
-                  <button 
-                    className="btn-action btn-print"
-                    onClick={() => imprimirTicket(item)}
-                  >
-                    <Printer size={14} />
-                  </button>
-
-                  {/* 5. CANCELAR (Troquei o FaTrash pelo Ban para ficar mais "clínico") */}
-                  <button
-                    className="btn-action btn-delete"
-                    title="Cancelar Consulta"
-                    onClick={() => {/* função de deletar */}}
-                  >
-                    <Ban size={15} />
-                  </button>
+                  <button className="btn-action" title="Reagendar"><CalendarClock size={15} /></button>
+                  <button className="btn-action" title="Editar dados"><Pencil size={15} /></button>
+                  <button className="btn-action btn-whatsapp" onClick={() => alert(`WhatsApp para ${item.paciente}`)}><FaWhatsapp size={16} /></button>
+                  <button className="btn-action btn-print" onClick={() => imprimirTicket(item)}><Printer size={14} /></button>
+                  <button className="btn-action btn-delete" title="Cancelar Consulta"><Ban size={15} /></button>
                 </div>
               </div>
             );
@@ -441,7 +336,7 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* --- MODAIS (Mantenha aqui) --- */}
+      {/* --- MODAIS --- */}
       {isModalNovoOpen && (
         <ModalNovoAgendamento
           onClose={() => setIsModalNovoOpen(false)}
@@ -452,15 +347,23 @@ const Dashboard = () => {
           }}
         />
       )}
-      
+
       {isModalClinicasOpen && (
-        <ModalGerenciarClinicas 
-          onClose={() => setIsModalClinicasOpen(false)} 
-          clinicas={clinicas}     
+        <ModalGerenciarClinicas
+          onClose={() => setIsModalClinicasOpen(false)}
+          clinicas={clinicas}
           setClinicas={setClinicas}
         />
       )}
+      
+      <ModalPerfil
+        isOpen={isModalPerfilOpen}
+        onClose={() => setIsModalPerfilOpen(false)}
+        onLogout={handleLogout}
+      />
     </div>
+
   );
 };
+
 export default Dashboard;
