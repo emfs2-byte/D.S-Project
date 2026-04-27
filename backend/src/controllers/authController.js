@@ -28,24 +28,16 @@ exports.register = async (req, res) => {
     }
 };
 
-exports.login = async (req, res) => {
-    const { email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ error: "Email e senha são obrigatórios" });
-    }
+exports.login = async (req, res) => {
+    const { username, password } = req.body; 
 
     try {
-        const user = await User.findOne({ email });
-
-        if (!user) {
-            return res.status(401).json({ error: "Usuário não encontrado" });
-        }
+        const user = await User.findOne({ username });
+        if (!user) return res.status(401).json({ error: "Usuário não encontrado" });
 
         const isMatch = await user.comparePassword(password);
-        if (!isMatch) {
-            return res.status(401).json({ error: "Senha incorreta" });
-        }
+        if (!isMatch) return res.status(401).json({ error: "Senha incorreta" });
 
         const token = jwt.sign(
             { id: user._id },
@@ -59,6 +51,6 @@ exports.login = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({ error: "Erro no servidor durante o login" });
+        res.status(500).json({ error: "Erro no servidor" });
     }
 };
