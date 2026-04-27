@@ -2,15 +2,27 @@ import React, { useState } from 'react';
 import { FaUser, FaLock, FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { Calendar, Shield, MessageCircle, Monitor, Activity } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
+import api from '../../lib/api';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [lembrar, setLembrar] = useState(false);
   const [verSenha, setVerSenha] = useState(false);
+  const [lembrar, setLembrar] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [erro, setErro] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault(); 
-    navigate("/home"); 
+    setErro('');
+
+    try {
+      const response = await api.post('/auth/login', { username, password });
+      localStorage.setItem('@CliniDesk:token', response.data.token);
+      navigate("/home"); 
+    } catch (err) {
+      setErro(err.response?.data?.error || "Erro ao conectar com o servidor");
+    }
   };
 
   return (
@@ -62,6 +74,9 @@ const Login = () => {
         
         <form className="w-full max-w-[420px]" onSubmit={handleSubmit}>
           
+          {/* EXIBIÇÃO DE ERRO */}
+          {erro && <p className="text-red-500 text-sm font-bold mb-4">{erro}</p>}
+
           {/* O ÍCONE COM O SELO DE PULSO (IGUAL À FOTO) */}
           <div className="flex flex-col items-center lg:items-start mb-12">
             <div className="w-20 h-20 bg-white border border-slate-100 shadow-[0_15px_35px_rgba(0,0,0,0.05)] rounded-[24px] flex items-center justify-center relative mb-8">
@@ -84,7 +99,9 @@ const Login = () => {
                 <FaUser className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" />
                 <input 
                   type="text" 
-                  placeholder="erlon" 
+                  placeholder="erlon"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="w-full bg-[#f8fafc] border border-slate-100 rounded-[18px] py-5 pl-14 pr-6 outline-none focus:ring-4 focus:ring-blue-50 focus:bg-white focus:border-blue-200 transition-all text-slate-600 font-bold placeholder:text-slate-200"
                 />
               </div>
@@ -96,7 +113,9 @@ const Login = () => {
                 <FaLock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" />
                 <input 
                   type={verSenha ? "text" : "password"} 
-                  placeholder="•••••" 
+                  placeholder="•••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-[#f8fafc] border border-slate-100 rounded-[18px] py-5 pl-14 pr-14 outline-none focus:ring-4 focus:ring-blue-50 focus:bg-white focus:border-blue-200 transition-all text-slate-600 font-bold placeholder:text-slate-200"
                 />
                 <button 
@@ -104,7 +123,7 @@ const Login = () => {
                   onClick={() => setVerSenha(!verSenha)}
                   className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 hover:text-blue-500 transition-colors"
                 >
-                  <FaRegEye size={18} />
+                  {verSenha ? <FaRegEyeSlash size={18} /> : <FaRegEye size={18} />}
                 </button>
               </div>
             </div>
