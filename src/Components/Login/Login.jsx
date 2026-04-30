@@ -63,7 +63,7 @@ const Login = () => {
               <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center text-white border border-white/10">
                 <MessageCircle size={22} />
               </div>
-              <span className="text-lg font-medium text-white/90">Integração com WhatsApp</span>
+              <span className="text-lg font-medium text-white/90">...</span>
             </div>
           </div>
         </div>
@@ -78,7 +78,7 @@ const Login = () => {
           {erro && <p className="text-red-500 text-sm font-bold mb-4">{erro}</p>}
 
           {/* O ÍCONE COM O SELO DE PULSO (IGUAL À FOTO) */}
-          <div className="flex flex-col items-center lg:items-start mb-12">
+          <div className="flex flex-col items-center mb-12 text-center">
             <div className="w-20 h-20 bg-white border border-slate-100 shadow-[0_15px_35px_rgba(0,0,0,0.05)] rounded-[24px] flex items-center justify-center relative mb-8">
                 <Monitor className="text-[#0177fb]" size={42} />
                 {/* O detalhe do pulso azul escuro */}
