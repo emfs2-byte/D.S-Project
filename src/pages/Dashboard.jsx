@@ -6,6 +6,7 @@ import {
 import CliniDeskLogo from "../Components/Login/CliniDeskLogo";
 import ModalNovoAgendamento from '../Components/Modals/ModalNovoAgendamento';
 import ModalGerenciarClinicas from '../Components/Modals/ModalGerenciarClinicas';
+import ModalConfirmarCancelamento from '../Components/Modals/ModalConfirmarCancelamento';
 import '../styles/Dashboard.css';
 import { FaWhatsapp, FaPrint, FaTrash } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
@@ -15,6 +16,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import { format, parseISO, differenceInMinutes, isAfter, isSameDay, setHours, setMinutes } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import ModalPerfil from '../Components/Modals/ModalPerfil';
+import ModalEditarConsulta from '../Components/Modals/ModalEditarConsulta';
+import ModalReagendarConsulta from '../Components/Modals/ModalReagendarConsulta';
 
 registerLocale('pt-BR', ptBR);
 
@@ -85,7 +88,56 @@ const Dashboard = () => {
     { nome: "Odonto", fixa: true }
   ]);
 
+  const [consultaParaCancelar, setConsultaParaCancelar] = useState(null);
+  const abrirModalCancelamento = (consulta) => {
+    setConsultaParaCancelar(consulta);
+  };
+
+  const confirmarCancelamento = () => {
+    if (consultaParaCancelar) {
+      setConsultas(consultas.filter(c => c !== consultaParaCancelar));
+      setConsultaParaCancelar(null);
+    }
+  };
+
+  const fecharModalCancelamento = () => {
+    setConsultaParaCancelar(null);
+  };
+
   const [dataSelecionada, setDataSelecionada] = useState(new Date());
+
+  const [isModalEditarOpen, setIsModalEditarOpen] = useState(false);
+  const [consultaSelecionada, setConsultaSelecionada] = useState(null);
+
+  const abrirEditarConsulta = (consulta) => {
+    setConsultaSelecionada(consulta);
+    setIsModalEditarOpen(true);
+  };
+
+  const salvarEdicao = (consultaEditada) => {
+    const novasConsultas = consultas.map(c => 
+      c === consultaSelecionada ? consultaEditada : c
+    );
+    setConsultas(novasConsultas);
+    setIsModalEditarOpen(false);
+    setConsultaSelecionada(null);
+  };
+
+  const [isModalReagendarOpen, setIsModalReagendarOpen] = useState(false);
+
+  const abrirReagendarConsulta = (consulta) => {
+  setConsultaSelecionada(consulta);
+  setIsModalReagendarOpen(true);
+  };
+
+const salvarReagendamento = (consultaReagendada) => {
+  const novasConsultas = consultas.map(c => 
+    c === consultaSelecionada ? consultaReagendada : c
+  );
+  setConsultas(novasConsultas);
+  setIsModalReagendarOpen(false);
+  setConsultaSelecionada(null);
+};
 
   const getHorarioColor = (dataConsulta, horarioConsulta) => {
     const [ano, mes, dia] = dataConsulta.split('-');
@@ -145,6 +197,40 @@ const Dashboard = () => {
     const matchesSetor = setorSelecionado === 'Todos os setores' || consulta.setor === setorSelecionado;
     return matchesData && matchesSetor;
   });
+
+  const getSetorColor = (setor) => {
+    const cores = {
+      "Geriatria": "#dcfce7",        // verde claro
+      "Clínica Médica": "#dbeafe",   // azul claro
+      "Enfermagem": "#fef3c7",       // amarelo claro
+      "Nutrição": "#fed7aa",         // laranja claro
+      "Psicologia": "#e0e7ff",       // índigo claro
+      "Serviço Social": "#fce7f3",   // rosa claro
+      "Fisioterapia": "#ccfbf1",     // teal claro
+      "Terapia Ocupacional": "#ede9fe", // roxo claro
+      "Fonoaudiologia": "#cffafe",   // ciano claro
+      "Odonto": "#fef9c3"            // amarelo limão
+    };
+    
+    // Cores de texto correspondentes (mais escuras para contraste)
+    const textColors = {
+      "Geriatria": "#166534",
+      "Clínica Médica": "#1e40af",
+      "Enfermagem": "#92400e",
+      "Nutrição": "#9a3412",
+      "Psicologia": "#3730a3",
+      "Serviço Social": "#9d174d",
+      "Fisioterapia": "#115e59",
+      "Terapia Ocupacional": "#5b21b6",
+      "Fonoaudiologia": "#155e75",
+      "Odonto": "#713f12"
+    };
+    
+    return {
+      background: cores[setor] || "#f1f5f9",
+      color: textColors[setor] || "#475569"
+    };
+  };
 
   return (
     <div className="dashboard-container">
@@ -213,7 +299,7 @@ const Dashboard = () => {
         </div>
 
         <div className="user-actions">
-          <div className="user-avatar">HJBC</div>
+          <div className="user-avatar"></div>
           {/* Botão Sair com funcionalidade */}
           <div className="logout-button" onClick={handleLogout} style={{ cursor: 'pointer' }}>
             <LogOut size={18} /><span>Sair</span>
@@ -303,15 +389,32 @@ const Dashboard = () => {
             const consultaOriginalIndex = consultas.findIndex(c => c === item);
 
             return (
-              <div key={index} className="table-row group">
+              <div key={index} className={`table-row group ${item.lembreteEnviadoPor ? 'lembrete-enviado' : ''}`}>
                 <div className="patient-name">{item.paciente}</div>
                 <div className="resp-name">{item.responsavel}</div>
                 <div className="contacts-cell">
-                  <span>{item.telPaciente}</span>
-                  <span className="sub-contact">{item.telResponsavel}</span>
+                  <span className="tel-paciente">{item.telPaciente}</span>
+                  <span className="tel-responsavel">{item.telResponsavel}</span>
                 </div>
-                <div><span className="sector-badge">{item.setor}</span></div>
-                <div><span className={`time-badge ${horarioColor}`}>{item.horario}</span></div>
+                <div>
+                  <span 
+                    className="sector-badge"
+                    style={{
+                      backgroundColor: getSetorColor(item.setor).background,
+                      color: getSetorColor(item.setor).color
+                    }}
+                  >
+                    {item.setor}
+                  </span>
+                </div>
+                <div>
+                  <span className={`time-badge ${horarioColor}`}>
+                    {horarioColor === 'horario-atrasado' && (
+                      <span className="alert-blink"></span>
+                    )}
+                    {item.horario}
+                  </span>
+                </div>
 
                 <div className="status-cell">
                   <button
@@ -324,11 +427,29 @@ const Dashboard = () => {
                 </div>
 
                 <div className="actions-cell">
-                  <button className="btn-action" title="Reagendar"><CalendarClock size={15} /></button>
-                  <button className="btn-action" title="Editar dados"><Pencil size={15} /></button>
+                  <button 
+                    className="btn-action" 
+                    title="Reagendar"
+                    onClick={() => abrirReagendarConsulta(item)}
+                  >
+                    <CalendarClock size={15} />
+                  </button>
+                  <button 
+                    className="btn-action" 
+                    title="Editar dados"
+                    onClick={() => abrirEditarConsulta(item)}
+                  >
+                    <Pencil size={15} />
+                  </button>
                   <button className="btn-action btn-whatsapp" onClick={() => alert(`WhatsApp para ${item.paciente}`)}><FaWhatsapp size={16} /></button>
                   <button className="btn-action btn-print" onClick={() => imprimirTicket(item)}><Printer size={14} /></button>
-                  <button className="btn-action btn-delete" title="Cancelar Consulta"><Ban size={15} /></button>
+                  <button 
+                    className="btn-action btn-delete" 
+                    title="Cancelar Consulta"
+                    onClick={() => abrirModalCancelamento(item)}
+                  >
+                    <Ban size={15} />
+                  </button>
                 </div>
               </div>
             );
@@ -361,6 +482,39 @@ const Dashboard = () => {
         onClose={() => setIsModalPerfilOpen(false)}
         onLogout={handleLogout}
       />
+      {consultaParaCancelar && (
+        <ModalConfirmarCancelamento
+          consulta={consultaParaCancelar}
+          onClose={fecharModalCancelamento}
+          onConfirm={confirmarCancelamento}
+        />
+      )}
+
+     {/* MODAL DE EDIÇÃO */}
+      {isModalEditarOpen && consultaSelecionada && (
+        <ModalEditarConsulta
+          onClose={() => {
+            setIsModalEditarOpen(false);
+            setConsultaSelecionada(null);
+          }}
+          onSave={salvarEdicao}
+          consulta={consultaSelecionada}
+          clinicas={clinicas}
+        />
+      )}
+
+      {/* MODAL DE REAGENDAMENTO */}
+      {isModalReagendarOpen && consultaSelecionada && (
+        <ModalReagendarConsulta
+          onClose={() => {
+            setIsModalReagendarOpen(false);
+            setConsultaSelecionada(null);
+          }}
+          onSave={salvarReagendamento}
+          consulta={consultaSelecionada}
+        />
+      )}
+
     </div>
 
   );

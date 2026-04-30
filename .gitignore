@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# backend (NUNCA commitar na branch front)
+backend/
+
+# dependências
+node_modules/
+.env
+
+# arquivos do sistema
+.DS_Store
+Thumbs.db
