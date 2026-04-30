@@ -2,22 +2,22 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
 exports.register = async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, username, password } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !username || !password) {
         return res.status(400).json({ error: "Todos os campos são obrigatórios" });
     }
 
     try {
         const novoUsuario = await User.create({
             name,
-            email,
+            username,
             password
         });
 
         res.status(201).json({
             message: "Usuário registrado com sucesso!",
-            dados: { id: novoUsuario._id, name, email }
+            dados: { id: novoUsuario._id, name, username }
         });
 
     } catch (error) {
