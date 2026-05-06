@@ -22,7 +22,7 @@ exports.register = async (req, res) => {
 
     } catch (error) {
         if (error.code === 11000) {
-            return res.status(400).json({ error: "Este e-mail já está cadastrado" });
+            return res.status(400).json({ error: "Nome de usuário já está em uso"  });
         }
         res.status(500).json({ error: "Erro no banco de dados" });
     }
@@ -34,10 +34,10 @@ exports.login = async (req, res) => {
 
     try {
         const user = await User.findOne({ username });
-        if (!user) return res.status(401).json({ error: "Usuário não encontrado" });
+        if (!user) return res.status(401).json({ error: "Credenciais inválidas" });
 
         const isMatch = await user.comparePassword(password);
-        if (!isMatch) return res.status(401).json({ error: "Senha incorreta" });
+        if (!isMatch) return res.status(401).json({ error: "Credenciais inválidas" });
 
         const token = jwt.sign(
             { id: user._id },
