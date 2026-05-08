@@ -2,10 +2,9 @@ const mongoose = require('mongoose');
 
 //Schema de agendamento
 const AgendamentoSchema = new mongoose.Schema({
-    // Referência ao paciente ja cadastrado (Paciente.js)
-  paciente: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Paciente', 
+  // Nome do paciente
+  nome_paciente: {
+    type: String,
     required: true,
   },
   // Telefone do paciente
@@ -26,12 +25,12 @@ const AgendamentoSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-    // Data da consulta
+  // Data da consulta
   data: {
     type: Date,
     required: true,
   },
-   // Horário da consulta 
+  // Horário da consulta 
   horario: {
     type: String,
     required: true,
@@ -39,5 +38,6 @@ const AgendamentoSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
 // Exporta o model para ser usado em controllers e rotas
 module.exports = mongoose.model('Agendamento', AgendamentoSchema);

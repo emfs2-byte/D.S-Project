@@ -3,7 +3,8 @@ const router = express.Router();
 const patientController = require('../controllers/patientController');
 const auth = require('../middlewares/auth');
 
-router.get('/', auth, patientController.getPacientes);
-router.post('/cadastrar', patientController.createPaciente);
+// Rotas de Consultas/Agendamentos
+router.post('/agendar', auth, patientController.agendarConsulta);
+router.get('/consultas', auth, patientController.getConsultas);
 
 module.exports = router;

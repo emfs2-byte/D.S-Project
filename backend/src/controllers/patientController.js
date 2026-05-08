@@ -1,20 +1,26 @@
-const Paciente = require('../models/Paciente');
+const Agendamento = require('../models/Agendamento');
 
-exports.getPacientes = async (req, res) => {
+// Funções de Agendamento
+
+exports.agendarConsulta = async (req, res) => {
     try {
-        const pacientes = await Paciente.find();
-        res.status(200).json(pacientes);
+        // Criar o agendamento diretamente com os dados do corpo da requisição
+        const novoAgendamento = new Agendamento(req.body);
+
+        await novoAgendamento.save();
+        res.status(201).json({ message: "Consulta agendada com sucesso!", agendamento: novoAgendamento });
+
     } catch (error) {
-        res.status(500).json({ error: "Erro ao buscar pacientes." });
+        res.status(400).json({ error: "Erro ao realizar agendamento: " + error.message });
     }
 };
 
-exports.createPaciente = async (req, res) => {
+exports.getConsultas = async (req, res) => {
     try {
-        const novoPaciente = await Paciente.create(req.body);
-        res.status(201).json({ message: "Paciente cadastrado!", paciente: novoPaciente });
+        // Busca todas as consultas cadastradas ordenando por data e horário
+        const consultas = await Agendamento.find().sort({ data: 1, horario: 1 });
+        res.status(200).json(consultas);
     } catch (error) {
-        if (error.code === 11000) return res.status(400).json({ error: "CPF já cadastrado." });
-        res.status(400).json({ error: error.message });
+        res.status(500).json({ error: "Erro ao buscar consultas." });
     }
 };
