@@ -9,23 +9,31 @@ export default defineConfig({
     globals: true, 
     // Simula o ambiente de navegador para testes de componentes React
     environment: 'jsdom', 
+    
     // Define onde os testes estão localizados
-    include: ['src/**/*.{test,spec}.{ts,tsx,js,jsx}'],
+    include: [
+      'Front/src/**/*.{test,spec}.{ts,tsx,js,jsx}',
+      'backend/src/**/*.{test,spec}.{ts,tsx,js,jsx}'
+    ],
+    
     // Configurações de cobertura de código
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       reportsDirectory: './coverage',
-      // Arquivos que não devem contar na cobertura
+      // Arquivos que não devem contar na cobertura 
       exclude: [
         'node_modules/',
-        'src/main.tsx',
-        'src/vite-env.d.ts',
+        'Front/src/main.tsx',
+        'Front/src/vite-env.d.ts',
       ],
     },
-    // Atalho para resolver imports 
+    
+    // Atalho para resolver imports
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, './Front/src'),
+      // Atalho pro backend depois, é só usar a linha abaixo:
+      // '@backend': path.resolve(__dirname, './backend/src'),
     },
   },
 });
