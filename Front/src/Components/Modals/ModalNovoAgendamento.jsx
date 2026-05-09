@@ -1,0 +1,127 @@
+import React, { useState } from 'react';
+import { X } from 'lucide-react';
+import './ModalNovoAgendamento.css';
+
+// 1. Recebemos 'clinicas' como prop do Dashboard
+const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
+  const [formData, setFormData] = useState({
+    paciente: '',
+    responsavel: '',
+    telPaciente: '',
+    telResponsavel: '',
+    setor: clinicas[0]?.nome || '', // Define a primeira clínica da lista como padrão
+    data: '2026-04-17',
+    horario: ''
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave({ ...formData, status: '✔' });
+  };
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-container">
+        <div className="modal-header">
+          <button onClick={onClose} className="btn-close" style={{ position: 'absolute', right: '1.5rem', top: '1.5rem', color: 'white', background: 'none', border: 'none', cursor: 'pointer' }}>
+            <X size={24} />
+          </button>
+          <h2 className="text-2xl font-bold">Novo Agendamento</h2>
+          <p className="opacity-90">Preencha os dados para agendar uma nova consulta.</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="modal-form">
+          <div className="form-grid">
+            <div className="input-group">
+              <label className="input-label">Paciente *</label>
+              <input 
+                required
+                className="form-input"
+                placeholder="Nome do paciente"
+                onChange={(e) => setFormData({...formData, paciente: e.target.value})}
+              />
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Responsável *</label>
+              <input 
+                required
+                className="form-input"
+                placeholder="Nome do responsável"
+                onChange={(e) => setFormData({...formData, responsavel: e.target.value})}
+              />
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Tel. Paciente</label>
+              <input 
+                className="form-input"
+                placeholder="+55 (81) 99999-0000"
+                onChange={(e) => setFormData({...formData, telPaciente: e.target.value})}
+              />
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Tel. Responsável *</label>
+              <input 
+                required
+                className="form-input"
+                placeholder="+55 (81) 99999-0000"
+                onChange={(e) => setFormData({...formData, telResponsavel: e.target.value})}
+              />
+            </div>
+
+            <div className="input-group full-width">
+              <label className="input-label">Setor *</label>
+              <select 
+                className="form-select"
+                value={formData.setor}
+                onChange={(e) => setFormData({...formData, setor: e.target.value})}
+              >
+                {/* Mapeamos a lista dinâmica */}
+                {clinicas.map((clinica, index) => (
+                  <option key={index} value={clinica.nome}>
+                    {clinica.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Data *</label>
+              <input 
+                type="date"
+                required
+                className="form-input"
+                defaultValue="2026-04-17"
+                onChange={(e) => setFormData({...formData, data: e.target.value})}
+              />
+            </div>
+
+            <div className="input-group">
+              <label className="input-label">Horário *</label>
+              <input 
+                type="time"
+                required
+                className="form-input"
+                onChange={(e) => setFormData({...formData, horario: e.target.value})}
+              />
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <button type="button" onClick={onClose} className="btn-cancel">
+              Cancelar
+            </button>
+            <button type="submit" className="btn-submit">
+              Agendar
+            </button>
+          </div>
+        </form>
+        <div style={{ textAlign: 'center', paddingBottom: '1rem', fontSize: '0.7rem', color: '#cbd5e1' }}>CliniDesk</div>
+      </div>
+    </div>
+  );
+};
+
+export default ModalNovoAgendamento;
