@@ -24,3 +24,27 @@ exports.getConsultas = async (req, res) => {
         res.status(500).json({ error: "Erro ao buscar consultas." });
     }
 };
+
+exports.getAppointments = async (req, res) => {
+    try {
+        const { date, setor } = req.query;
+        const filtro = {};
+
+        if (date) {
+            const inicio = new Date(date);
+            const fim = new Date(date);
+            fim.setDate(fim.getDate() + 1);
+            filtro.data = { $gte: inicio, $lt: fim };
+        }
+
+        if (setor) {
+            filtro.setor = setor;
+        }
+
+        const consultas = await Agendamento.find(filtro).sort({ data: 1, horario: 1 });
+        res.status(200).json(consultas);
+
+    } catch (error) {
+        res.status(500).json({ error: "Erro ao buscar agendamentos." });
+    }
+};
