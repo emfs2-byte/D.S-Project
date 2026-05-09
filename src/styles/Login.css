@@ -6,7 +6,7 @@
 }
 
 
-/* ESTILOS DA LOGO */
+
 .clinidesk-logo-container {
   display: flex;
   align-items: center; 
@@ -100,7 +100,6 @@
   text-align: center;
 }
 
-/* LISTA DE FEATURES */
 .features {
   display: flex;
   flex-direction: column;
@@ -201,7 +200,6 @@
   font-size: 12px;
 }
 
-/* AJUSTE RADIO BUTTON  */
 .remember-me {
   display: flex;
   align-items: center;
@@ -334,7 +332,7 @@
   cursor: pointer;
   
   background: linear-gradient(135deg, #0061f2 0%, #0091ff 50%, #22d3ee 100%);
-  background-size: 200% auto; /* Aumentamos para permitir a animação */
+  background-size: 200% auto;
   
   box-shadow: 0 10px 20px -5px rgba(0, 145, 255, 0.4);
   
