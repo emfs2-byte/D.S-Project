@@ -53,4 +53,28 @@ exports.login = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: "Erro no servidor" });
     }
+    // Buscar os dados da recepcionista logada
+    exports.getMe = async (req, res) => {
+        try {
+            // No middleware (auth.js) o ID foi salvo em req.user. Vamos usá-lo para bucar no banco. 
+            // O comando .select('-password') garante que não vamos enviar a senha de volta.
+            const user = await User.findById(req.user).select('-password');
+
+            if (!user) {
+                return res.status(404).json({ error: "Usuário não encontrado" });
+            }
+
+            // Devolve os dados 
+            res.status(200).json({
+                id: user._id,
+                nome: user.name,
+                iniciais: user.username, // 
+                cargo: "Recepcionista"   // 
+            });
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Erro no servidor ao buscar o perfil" });
+        }
+    };
 };
