@@ -387,7 +387,28 @@ const salvarReagendamento = (consultaReagendada) => {
           consultasFiltradas.map((item, index) => {
             const horarioColor = getHorarioColor(item.data, item.horario);
             const consultaOriginalIndex = consultas.findIndex(c => c === item);
+            const handleWhatsApp = (item) => {
+            const telefoneBruto = item.telPaciente || ""; 
+            const numeroLimpo = String(telefoneBruto).replace(/\D/g, '');
 
+            if (!numeroLimpo) {
+                alert("Este paciente não possui um número de telefone cadastrado.");
+                return;
+            }
+
+            // Pega os dados da consulta (ajuste 'item.data' e 'item.horario' se os nomes no backend forem diferentes)
+            const setor = item.setor || 'nossa clínica';
+            const dataConsulta = item.data || 'sua data agendada';
+            const horaConsulta = item.horario || 'seu horário agendado';
+
+            // Monta a NOVA mensagem com Data e Hora
+            const mensagem = `Olá, ${item.paciente}! Sua consulta no setor de ${setor} está confirmada para o dia ${dataConsulta} às ${horaConsulta}.`;
+            
+            const url = `https://wa.me/55${numeroLimpo}?text=${encodeURIComponent(mensagem)}`;
+
+            // Abre a aba do WhatsApp
+            window.open(url, '_blank');
+        };
             return (
               <div key={index} className={`table-row group ${item.lembreteEnviadoPor ? 'lembrete-enviado' : ''}`}>
                 <div className="patient-name">{item.paciente}</div>
@@ -441,7 +462,7 @@ const salvarReagendamento = (consultaReagendada) => {
                   >
                     <Pencil size={15} />
                   </button>
-                  <button className="btn-action btn-whatsapp" onClick={() => alert(`WhatsApp para ${item.paciente}`)}><FaWhatsapp size={16} /></button>
+                  <button className="btn-action btn-whatsapp" onClick={() => handleWhatsApp(item)}><FaWhatsapp size={16} /></button>
                   <button className="btn-action btn-print" onClick={() => imprimirTicket(item)}><Printer size={14} /></button>
                   <button 
                     className="btn-action btn-delete" 
