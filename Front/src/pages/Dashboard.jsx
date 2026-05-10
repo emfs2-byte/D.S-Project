@@ -396,12 +396,12 @@ const salvarReagendamento = (consultaReagendada) => {
                 return;
             }
 
-            // Pega os dados da consulta (ajuste 'item.data' e 'item.horario' se os nomes no backend forem diferentes)
+            // Pega os dados da consulta 
             const setor = item.setor || 'nossa clínica';
             const dataConsulta = item.data || 'sua data agendada';
             const horaConsulta = item.horario || 'seu horário agendado';
 
-            // Monta a NOVA mensagem com Data e Hora
+            // Mensagem de envio no whatszapp
             const mensagem = `Olá, ${item.paciente}! Sua consulta no setor de ${setor} está confirmada para o dia ${dataConsulta} às ${horaConsulta}.`;
             
             const url = `https://wa.me/55${numeroLimpo}?text=${encodeURIComponent(mensagem)}`;
