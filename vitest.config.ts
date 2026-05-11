@@ -12,8 +12,8 @@ export default defineConfig({
     
     // Define onde os testes estão localizados
     include: [
-      'Front/src/**/*.{test,spec}.{ts,tsx,js,jsx}',
-      'backend/src/**/*.{test,spec}.{ts,tsx,js,jsx}'
+      'src/**/*.{test,spec}.{ts,tsx,js,jsx}',
+      '**/src/**/*.{test,spec}.{ts,tsx,js,jsx}'
     ],
     
     // Configurações de cobertura de código
