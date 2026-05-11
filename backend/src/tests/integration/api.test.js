@@ -42,4 +42,10 @@ describe('Testes de Integração - API NPI', () => {
     // Validação do status esperado para regras de negócio de horário
     expect(response.status).toBe(400);
   });
+
+  it('Deve retornar 404 para uma rota inexistente', async () => {
+    // Valida se a API responde corretamente a caminhos inválidos
+    const response = await request(app).get('/api/rota-inexistente');
+    expect(response.status).toBe(404);
+  });
 });
