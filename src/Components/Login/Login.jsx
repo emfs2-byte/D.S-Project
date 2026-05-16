@@ -28,11 +28,11 @@ const Login = () => {
   return (
     <div className="flex min-h-screen w-full bg-white font-sans overflow-hidden">
       
-      /LADO ESQUERDO/
+      {/*LADO ESQUERDO*/}
       <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-[#054381] via-[#0073e6] to-[#01bfb5] flex-col justify-center p-20 relative">
         <div className="relative z-10 w-full max-w-md mx-auto">
           
-          /LOGO LADO ESQUERDO/
+          {/*LOGO LADO ESQUERDO*/}
           <div className="flex items-center gap-4 mb-20">
             <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-2xl">
               <Monitor className="text-white" size={32} />
@@ -43,7 +43,7 @@ const Login = () => {
             </div>
           </div>
           
-          /FEATURES COM ÍCONES VAZADOS/
+          {/*FEATURES COM ÍCONES VAZADOS*/}
           <div className="space-y-10">
             <div className="flex items-center gap-6">
               <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center text-white border border-white/10">
@@ -69,12 +69,12 @@ const Login = () => {
         </div>
       </div>
 
-      /LADO DIREITO/
+      {/*LADO DIREITO*/}
       <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 bg-white">
         
         <form className="w-full max-w-[420px]" onSubmit={handleSubmit}>
           
-          /EXIBIÇÃO DE ERRO/
+          {/*EXIBIÇÃO DE ERRO*/}
           {erro && <p className="text-red-500 text-sm font-bold mb-4">{erro}</p>}
 
           
@@ -86,27 +86,28 @@ const Login = () => {
                 </div>
             </div>
 
-            <h1 className="text-[34px] font-black text-[#001d3d] leading-tight">Bem-vindo ao CliniDesk</h1>
+            <h1 className="text-[34px] font-black text-[#001d3d] leading-tight">
+              Bem-vindo ao Clini<span className='text-[#007BFF]'>Desk </span></h1>
             <p className="text-slate-400 font-semibold text-base mt-1">Faça login para acessar o painel</p>
           </div>
 
           <div className="space-y-6">
             <div>
-              <label className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-2 block ml-1">Iniciais do Usuário</label>
+              <label className="text-[10px] font-black text-[#003566] uppercase tracking-[0.2em] mb-2 block ml-1">Iniciais do Usuário</label>
               <div className="relative">
                 <FaUser className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" />
                 <input 
                   type="text" 
-                  placeholder="erlon"
+                  placeholder="nome"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full bg-[#f8fafc] border border-slate-100 rounded-[18px] py-5 pl-14 pr-6 outline-none focus:ring-4 focus:ring-blue-50 focus:bg-white focus:border-blue-200 transition-all text-slate-600 font-bold placeholder:text-slate-200"
+                  className="w-full bg-[#f1f5f9] border border-slate-200 rounded-[18px] py-5 pl-14 pr-6 outline-none focus:ring-4 focus:ring-blue-50 focus:bg-white focus:border-blue-200 transition-all text-slate-600 font-bold placeholder:text-slate-200"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-2 block ml-1">Senha</label>
+              <label className="text-[10px] font-black text-[#003566] uppercase tracking-[0.2em] mb-2 block ml-1">Senha</label>
               <div className="relative">
                 <FaLock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" />
                 <input 
@@ -114,7 +115,7 @@ const Login = () => {
                   placeholder="•••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#f8fafc] border border-slate-100 rounded-[18px] py-5 pl-14 pr-14 outline-none focus:ring-4 focus:ring-blue-50 focus:bg-white focus:border-blue-200 transition-all text-slate-600 font-bold placeholder:text-slate-200"
+                  className="w-full bg-[#f1f5f9] border border-slate-200 rounded-[18px] py-5 pl-14 pr-14 outline-none focus:ring-4 focus:ring-blue-50 focus:bg-white focus:border-blue-200 transition-all text-slate-600 font-bold placeholder:text-slate-200"
                 />
                 <button 
                   type="button"
@@ -127,10 +128,10 @@ const Login = () => {
             </div>
           </div>
 
-          /OPÇÕES/
+          {/*OPÇÕES*/}
           <div className="flex justify-between items-center mt-8 mb-10">
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setLembrar(!lembrar)}>
-              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${lembrar ? 'border-[#00a8c5] bg-[#00a8c5]' : 'border-slate-100'}`}>
+              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${lembrar ? 'border-[#00a8c5] bg-[#00a8c5]' : 'border-slate-400 bg-slate-50 hover:border-slate-500'}`}>
                 {lembrar && <div className="w-2 h-2 bg-white rounded-full" />}
               </div>
               <span className="text-sm text-slate-400 font-bold">Lembrar de mim</span>
@@ -138,17 +139,17 @@ const Login = () => {
             <a href="#" className="text-sm text-[#00a8c5] font-black hover:underline">Esqueci minha senha</a>
           </div>
 
-          / BOTÃO ENTRAR/
+          {/* BOTÃO ENTRAR*/}
           <button 
             type="submit" 
-            className="w-full bg-gradient-to-r from-[#0162dd] to-[#01b6d1] text-white font-black py-5 rounded-[22px] shadow-2xl shadow-blue-100 transition-all transform active:scale-[0.98] text-lg tracking-widest uppercase"
+            className="w-full bg-gradient-to-r from-[#0162dd] to-[#01b6d1] text-white font-black py-5 rounded-[22px] shadow-2xl shadow-blue-100 text-lg tracking-widest uppercase transform transition-all duration-300 ease-in-out hover:from-[#014eb1] hover:to-[#0192a8] hover:shadow-blue-300 hover:-translate-y-0.5 active:scale-[0.98]"
           >
             Entrar
           </button>
 
           <div className="text-center mt-10">
             <span className="text-sm text-slate-300 font-bold">Não tem uma conta? </span>
-            <a href="#" className="text-sm text-[#00a8c5] font-black hover:underline">Criar conta</a>
+            <a href="#" className="ml-1 text-sm text-[#00a8c5] font-black hover:underline">Criar conta</a>
           </div>
 
           <div className="mt-16 text-center space-y-1 opacity-40">
