@@ -85,7 +85,7 @@ const Dashboard = () => {
     { nome: "Fisioterapia", fixa: true },
     { nome: "Terapia Ocupacional", fixa: true },
     { nome: "Fonoaudiologia", fixa: true },
-    { nome: "Odonto", fixa: true }
+    //{ nome: "Odonto", fixa: true } removido
   ]);
 
   const [consultaParaCancelar, setConsultaParaCancelar] = useState(null);
@@ -233,61 +233,9 @@ const salvarReagendamento = (consultaReagendada) => {
   };
 
   return (
-    <div className="dashboard-container">
-
-      {/* --- MENU LATERAL (SIDEBAR) --- */}
-      <div
-        className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`}
-        onClick={() => setIsSidebarOpen(false)}
-      >
-        <aside
-          className={`sidebar-menu ${isSidebarOpen ? 'open' : ''}`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="sidebar-header">
-            <div className="user-info-sidebar">
-              <div className="user-avatar-large">HJ</div>
-              <div>
-                <h3>HJBC</h3>
-                <p>CliniDesk • Recepcionista</p>
-              </div>
-            </div>
-            <button className="close-sidebar" onClick={() => setIsSidebarOpen(false)}>
-              <XCircle size={24} />
-            </button>
-          </div>
-
-          <nav className="sidebar-nav">
-            <button
-              className="nav-item active"
-              onClick={() => {
-                setIsModalPerfilOpen(true);
-                setIsSidebarOpen(false); // Fecha a sidebar ao abrir o modal
-              }}
-            >
-              <User size={18} /> Perfil
-            </button>
-            <button className="nav-item">
-              <Settings size={18} /> Configurações
-            </button>
-          </nav>
-
-          <button className="sidebar-logout" onClick={handleLogout}>
-            <LogOut size={18} /> Sair
-          </button>
-        </aside>
-      </div>
-
+    <div className="dashboard-container">   
       <header className="dashboard-header">
         <div className="brand-group">
-          {/* Menu Icone que abre o Sidebar */}
-          <Menu
-            size={24}
-            className="menu-handle"
-            onClick={() => setIsSidebarOpen(true)}
-            style={{ cursor: 'pointer' }}
-          />
-
           <div style={{
             transform: 'scale(0.55)',
             transformOrigin: 'left center',
@@ -418,7 +366,7 @@ const salvarReagendamento = (consultaReagendada) => {
 
                 <div className="status-cell">
                   <button
-                    onClick={() => toggleLembrete(consultaOriginalIndex, "HJBC")}
+                    onClick={() => toggleLembrete(consultaOriginalIndex, "Sistema")}
                     className={`status-circle ${item.lembreteEnviadoPor ? 'status-circle-enviado' : 'status-circle-pendente'}`}
                     title={item.lembreteEnviadoPor ? "Desmarcar lembrete" : "Marcar como enviado"}
                   >
