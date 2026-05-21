@@ -2,20 +2,50 @@ import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import './ModalNovoAgendamento.css';
 
-// 1. Recebemos 'clinicas' como prop do Dashboard
 const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
   const [formData, setFormData] = useState({
     paciente: '',
     responsavel: '',
     telPaciente: '',
     telResponsavel: '',
-    setor: clinicas[0]?.nome || '', // Define a primeira clínica da lista como padrão
+    setor: clinicas[0]?.nome || '', 
     data: '2026-04-17',
     horario: ''
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // --- PASSO 2: EARLY RETURN ---
+    // Em vez de aninhar ifs (if(paciente) { if(setor) {...} }), 
+    // nós barramos a execução na primeira falha.
+    
+    if (!formData.paciente.trim()) {
+      alert("O nome do paciente é obrigatório.");
+      return; 
+    }
+    if (!formData.responsavel.trim()) {
+      alert("O nome do responsável é obrigatório.");
+      return;
+    }
+    if (!formData.telResponsavel.trim()) {
+      alert("O telefone do responsável é obrigatório.");
+      return;
+    }
+    if (!formData.setor) {
+      alert("Por favor, selecione um setor.");
+      return;
+    }
+    if (!formData.data) {
+      alert("A data da consulta é obrigatória.");
+      return;
+    }
+    if (!formData.horario) {
+      alert("O horário da consulta é obrigatório.");
+      return;
+    }
+
+    // Se passar por todas as barreiras acima, pode salvar tranquilo!
     onSave({ ...formData, status: '✔' });
   };
 
@@ -78,7 +108,6 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
                 value={formData.setor}
                 onChange={(e) => setFormData({...formData, setor: e.target.value})}
               >
-                {/* Mapeamos a lista dinâmica */}
                 {clinicas.map((clinica, index) => (
                   <option key={index} value={clinica.nome}>
                     {clinica.nome}

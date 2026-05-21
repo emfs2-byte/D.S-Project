@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   Search, Calendar as CalendarIcon, Settings, Plus, LogOut, Menu, CheckCircle2, ChevronDown, Clock, Printer, Send, XCircle, CalendarClock,
   Pencil, Ban, User
-} from 'lucide-react'; // Adicionado User e XCircle
+} from 'lucide-react';
 import CliniDeskLogo from "../Components/Login/CliniDeskLogo";
 import ModalNovoAgendamento from '../Components/Modals/ModalNovoAgendamento';
 import ModalGerenciarClinicas from '../Components/Modals/ModalGerenciarClinicas';
@@ -20,6 +20,28 @@ import ModalEditarConsulta from '../Components/Modals/ModalEditarConsulta';
 import ModalReagendarConsulta from '../Components/Modals/ModalReagendarConsulta';
 
 registerLocale('pt-BR', ptBR);
+
+// --- Passo 1: Função utilitária para formatar datas (Evita Duplicated Code) ---
+const formatarDataBR = (data) => {
+  if (!data) return '';
+  // Garante que funciona tanto com strings ("2026-04-21") quanto com objetos Date
+  const dataObj = data instanceof Date ? data : new Date(data);
+  return format(dataObj, 'dd/MM/yyyy');
+};
+
+// --- Passo 3: Constantes para evitar Magic Strings ---
+const SETORES = {
+  GERIATRIA: "Geriatria",
+  CLINICA_MEDICA: "Clínica Médica",
+  ENFERMAGEM: "Enfermagem",
+  NUTRICAO: "Nutrição",
+  PSICOLOGIA: "Psicologia",
+  SERVICO_SOCIAL: "Serviço Social",
+  FISIOTERAPIA: "Fisioterapia",
+  TERAPIA_OCUPACIONAL: "Terapia Ocupacional",
+  FONOAUDIOLOGIA: "Fonoaudiologia",
+  ODONTO: "Odonto"
+};
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -42,7 +64,7 @@ const Dashboard = () => {
       responsavel: "João Silva",
       telPaciente: "+55 (11) 99999-0001",
       telResponsavel: "+55 (11) 98888-0001",
-      setor: "Geriatria",
+      setor: SETORES.GERIATRIA,
       data: "2026-04-21",
       horario: "07:00",
       status: "✔",
@@ -54,7 +76,7 @@ const Dashboard = () => {
       responsavel: "Ana Santos",
       telPaciente: "+55 (11) 99999-0002",
       telResponsavel: "+55 (11) 98888-0002",
-      setor: "Clínica Médica",
+      setor: SETORES.CLINICA_MEDICA,
       data: "2026-04-21",
       horario: "14:00",
       status: "✔",
@@ -66,7 +88,7 @@ const Dashboard = () => {
       responsavel: "Carlos Oliveira",
       telPaciente: "-",
       telResponsavel: "+55 (11) 98888-0003",
-      setor: "Nutrição",
+      setor: SETORES.NUTRICAO,
       data: "2026-04-21",
       horario: "05:30",
       status: "✔",
@@ -76,19 +98,20 @@ const Dashboard = () => {
   ]);
 
   const [clinicas, setClinicas] = useState([
-    { nome: "Geriatria", fixa: true },
-    { nome: "Clínica Médica", fixa: true },
-    { nome: "Enfermagem", fixa: true },
-    { nome: "Nutrição", fixa: true },
-    { nome: "Psicologia", fixa: true },
-    { nome: "Serviço Social", fixa: true },
-    { nome: "Fisioterapia", fixa: true },
-    { nome: "Terapia Ocupacional", fixa: true },
-    { nome: "Fonoaudiologia", fixa: true },
-    { nome: "Odonto", fixa: true }
+    { nome: SETORES.GERIATRIA, fixa: true },
+    { nome: SETORES.CLINICA_MEDICA, fixa: true },
+    { nome: SETORES.ENFERMAGEM, fixa: true },
+    { nome: SETORES.NUTRICAO, fixa: true },
+    { nome: SETORES.PSICOLOGIA, fixa: true },
+    { nome: SETORES.SERVICO_SOCIAL, fixa: true },
+    { nome: SETORES.FISIOTERAPIA, fixa: true },
+    { nome: SETORES.TERAPIA_OCUPACIONAL, fixa: true },
+    { nome: SETORES.FONOAUDIOLOGIA, fixa: true },
+    { nome: SETORES.ODONTO, fixa: true }
   ]);
 
   const [consultaParaCancelar, setConsultaParaCancelar] = useState(null);
+  
   const abrirModalCancelamento = (consulta) => {
     setConsultaParaCancelar(consulta);
   };
@@ -126,18 +149,18 @@ const Dashboard = () => {
   const [isModalReagendarOpen, setIsModalReagendarOpen] = useState(false);
 
   const abrirReagendarConsulta = (consulta) => {
-  setConsultaSelecionada(consulta);
-  setIsModalReagendarOpen(true);
+    setConsultaSelecionada(consulta);
+    setIsModalReagendarOpen(true);
   };
 
-const salvarReagendamento = (consultaReagendada) => {
-  const novasConsultas = consultas.map(c => 
-    c === consultaSelecionada ? consultaReagendada : c
-  );
-  setConsultas(novasConsultas);
-  setIsModalReagendarOpen(false);
-  setConsultaSelecionada(null);
-};
+  const salvarReagendamento = (consultaReagendada) => {
+    const novasConsultas = consultas.map(c => 
+      c === consultaSelecionada ? consultaReagendada : c
+    );
+    setConsultas(novasConsultas);
+    setIsModalReagendarOpen(false);
+    setConsultaSelecionada(null);
+  };
 
   const getHorarioColor = (dataConsulta, horarioConsulta) => {
     const [ano, mes, dia] = dataConsulta.split('-');
@@ -166,7 +189,8 @@ const salvarReagendamento = (consultaReagendada) => {
   };
 
   const imprimirTicket = (consulta) => {
-    const dataFormatada = format(new Date(consulta.data), 'dd/MM/yyyy');
+    // Usando a função utilitária refatorada
+    const dataFormatada = formatarDataBR(consulta.data);
     const conteudoTicket = `
       <html>
         <body onload="window.print(); window.close();">
@@ -192,44 +216,32 @@ const salvarReagendamento = (consultaReagendada) => {
   }, []);
 
   const consultasFiltradas = consultas.filter(consulta => {
-    const dataFormatada = format(dataSelecionada, 'yyyy-MM-dd');
+    // Usando a função utilitária refatorada
+    const dataFormatada = formatarDataBR(dataSelecionada);
+    // Nota de refatoração: se consulta.data estiver em formato ISO "YYYY-MM-DD", 
+    // a comparação com dataFormatada "DD/MM/YYYY" poderá falhar. 
+    // Certifique-se de que a gravação/leitura estão no mesmo formato esperado.
     const matchesData = consulta.data === dataFormatada;
     const matchesSetor = setorSelecionado === 'Todos os setores' || consulta.setor === setorSelecionado;
     return matchesData && matchesSetor;
   });
 
+  // Função refatorada para usar a constante SETORES
   const getSetorColor = (setor) => {
-    const cores = {
-      "Geriatria": "#dcfce7",        // verde claro
-      "Clínica Médica": "#dbeafe",   // azul claro
-      "Enfermagem": "#fef3c7",       // amarelo claro
-      "Nutrição": "#fed7aa",         // laranja claro
-      "Psicologia": "#e0e7ff",       // índigo claro
-      "Serviço Social": "#fce7f3",   // rosa claro
-      "Fisioterapia": "#ccfbf1",     // teal claro
-      "Terapia Ocupacional": "#ede9fe", // roxo claro
-      "Fonoaudiologia": "#cffafe",   // ciano claro
-      "Odonto": "#fef9c3"            // amarelo limão
+    const configuracaoCores = {
+      [SETORES.GERIATRIA]: { background: "#dcfce7", color: "#166534" },
+      [SETORES.CLINICA_MEDICA]: { background: "#dbeafe", color: "#1e40af" },
+      [SETORES.ENFERMAGEM]: { background: "#fef3c7", color: "#92400e" },
+      [SETORES.NUTRICAO]: { background: "#fed7aa", color: "#9a3412" },
+      [SETORES.PSICOLOGIA]: { background: "#e0e7ff", color: "#3730a3" },
+      [SETORES.SERVICO_SOCIAL]: { background: "#fce7f3", color: "#9d174d" },
+      [SETORES.FISIOTERAPIA]: { background: "#ccfbf1", color: "#115e59" },
+      [SETORES.TERAPIA_OCUPACIONAL]: { background: "#ede9fe", color: "#5b21b6" },
+      [SETORES.FONOAUDIOLOGIA]: { background: "#cffafe", color: "#155e75" },
+      [SETORES.ODONTO]: { background: "#fef9c3", color: "#713f12" }
     };
     
-    // Cores de texto correspondentes (mais escuras para contraste)
-    const textColors = {
-      "Geriatria": "#166534",
-      "Clínica Médica": "#1e40af",
-      "Enfermagem": "#92400e",
-      "Nutrição": "#9a3412",
-      "Psicologia": "#3730a3",
-      "Serviço Social": "#9d174d",
-      "Fisioterapia": "#115e59",
-      "Terapia Ocupacional": "#5b21b6",
-      "Fonoaudiologia": "#155e75",
-      "Odonto": "#713f12"
-    };
-    
-    return {
-      background: cores[setor] || "#f1f5f9",
-      color: textColors[setor] || "#475569"
-    };
+    return configuracaoCores[setor] || { background: "#f1f5f9", color: "#475569" };
   };
 
   return (
