@@ -232,6 +232,45 @@ const salvarReagendamento = (consultaReagendada) => {
     };
   };
 
+  // --- CONSTANTES E FUNÇÕES AUXILIARES DE SUPORTE ---
+  const DDI_BRASIL = '55';
+  const TEXTOS_PADRAO = {
+    SETOR: 'nossa clínica',
+    DATA: 'sua data agendada',
+    HORARIO: 'seu horário agendado'
+  };
+
+  // Limpa o número removendo caracteres não numéricos
+  const extrairNumeroLimpo = (telefoneBruto) => String(telefoneBruto || "").replace(/\D/g, '');
+
+  // Monta o corpo do texto dinamicamente
+  const montarMensagemLembrete = (item) => {
+    const setor = item.setor || TEXTOS_PADRAO.SETOR;
+    const dataConsulta = item.data || TEXTOS_PADRAO.DATA;
+    const horaConsulta = item.horario || TEXTOS_PADRAO.HORARIO;
+    return `Olá, ${item.paciente}! Sua consulta no setor de ${setor} está confirmada para o dia ${dataConsulta} às ${horaConsulta}.`;
+  };
+
+  // Gera a URL final de redirecionamento
+  const gerarLinkWhatsApp = (numeroLimpo, mensagem) => {
+    return `https://wa.me/${DDI_BRASIL}${numeroLimpo}?text=${encodeURIComponent(mensagem)}`;
+  };
+
+  // --- FUNÇÃO PRINCIPAL DE DISPARO (HANDLER) ---
+  const handleWhatsApp = (item) => {
+    const numeroLimpo = extrairNumeroLimpo(item.telPaciente);
+
+    if (!numeroLimpo) {
+      alert("Este paciente não possui um número de telefone cadastrado.");
+      return;
+    }
+
+    const mensagem = montarMensagemLembrete(item);
+    const url = gerarLinkWhatsApp(numeroLimpo, mensagem);
+
+    window.open(url, '_blank');
+  };
+
   return (
     <div className="dashboard-container">
 
@@ -387,28 +426,6 @@ const salvarReagendamento = (consultaReagendada) => {
           consultasFiltradas.map((item, index) => {
             const horarioColor = getHorarioColor(item.data, item.horario);
             const consultaOriginalIndex = consultas.findIndex(c => c === item);
-            const handleWhatsApp = (item) => {
-            const telefoneBruto = item.telPaciente || ""; 
-            const numeroLimpo = String(telefoneBruto).replace(/\D/g, '');
-
-            if (!numeroLimpo) {
-                alert("Este paciente não possui um número de telefone cadastrado.");
-                return;
-            }
-
-            // Pega os dados da consulta 
-            const setor = item.setor || 'nossa clínica';
-            const dataConsulta = item.data || 'sua data agendada';
-            const horaConsulta = item.horario || 'seu horário agendado';
-
-            // Mensagem de envio no whatszapp
-            const mensagem = `Olá, ${item.paciente}! Sua consulta no setor de ${setor} está confirmada para o dia ${dataConsulta} às ${horaConsulta}.`;
-            
-            const url = `https://wa.me/55${numeroLimpo}?text=${encodeURIComponent(mensagem)}`;
-
-            // Abre a aba do WhatsApp
-            window.open(url, '_blank');
-        };
             return (
               <div key={index} className={`table-row group ${item.lembreteEnviadoPor ? 'lembrete-enviado' : ''}`}>
                 <div className="patient-name">{item.paciente}</div>
