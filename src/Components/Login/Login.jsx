@@ -139,19 +139,12 @@ const Login = () => {
               </div>
               <span className="remember-me-text">Lembrar de mim</span>
             </div>
-            <a href="#" className="forgot-password-link">Esqueci minha senha</a>
           </div>
 
           {/* BOTÃO ENTRAR */}
           <button type="submit" className="submit-login-button">
             Entrar
           </button>
-
-          {/* CRIAR CONTA */}
-          <div className="signup-notice-wrapper">
-            <span className="signup-text">Não tem uma conta?</span>
-            <a href="#" className="signup-action-link">Criar conta</a>
-          </div>
 
           {/* RODAPÉ */}
           <div className="footer-credits-box">
