@@ -23,16 +23,16 @@ exports.agendarConsulta = async (req, res) => {
         });
 
     } catch (error) {
-        res.status(400).json({ error: "Erro ao realizar agendamento: " + error.message });
+        
+        res.status(500).json({ erro: "Erro interno ao salvar agendamento." });
     }
 };
-
 // ROTA: BUSCAR TODAS AS CONSULTAS
 exports.getConsultas = async (req, res) => {
     try {
         const consultas = await Agendamento.find().sort({ data: 1, horario: 1 });
         res.status(200).json(consultas);
     } catch (error) {
-        res.status(500).json({ error: "Erro ao buscar consultas." });
+        res.status(500).json({ erro: "Erro ao buscar consultas." });
     }
 };
