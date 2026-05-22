@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import ModalPerfil from '../Components/Modals/ModalPerfil';
 import ModalEditarConsulta from '../Components/Modals/ModalEditarConsulta';
 import ModalReagendarConsulta from '../Components/Modals/ModalReagendarConsulta';
+import ProntuarioDigital from '../Components/Prontuario/ProntuarioDigital';
 
 registerLocale('pt-BR', ptBR);
 
@@ -52,10 +53,16 @@ const Dashboard = () => {
   const [isSelectSetorOpen, setIsSelectSetorOpen] = useState(false);
   const [setorSelecionado, setSetorSelecionado] = useState('Todos os setores');
   const dropdownRef = useRef(null);
+  const [pacienteSelecionado, setPacienteSelecionado] = useState(null); 
 
   // Função para deslogar
   const handleLogout = () => {
     navigate('/');
+  };
+  
+  // Função para abrir o prontuário 
+  const abrirProntuario = (paciente) => {
+    setPacienteSelecionado(paciente);
   };
 
   const [consultas, setConsultas] = useState([
@@ -460,6 +467,14 @@ const Dashboard = () => {
                 </div>
 
                 <div className="actions-cell">
+                  {/* BOTÃO PRONTUÁRIO */}
+                  <button 
+                    className="btn-action" 
+                    title="Ver Prontuário"
+                    onClick={() => abrirProntuario(item)}
+                  >
+                    📋
+                  </button>
                   <button 
                     className="btn-action" 
                     title="Reagendar"
@@ -546,6 +561,56 @@ const Dashboard = () => {
           onSave={salvarReagendamento}
           consulta={consultaSelecionada}
         />
+      )}
+
+      {/* MODAL DO PRONTUÁRIO DIGITAL */}
+      {pacienteSelecionado && (
+        <div className="modal-overlay" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          zIndex: 1000,
+          overflow: 'auto'
+        }}>
+          <div style={{
+            position: 'relative',
+            maxWidth: '800px',
+            margin: '2rem auto',
+            background: 'white',
+            borderRadius: '12px',
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            <button
+              onClick={() => setPacienteSelecionado(null)}
+              style={{
+                position: 'sticky',
+                top: '1rem',
+                right: '1rem',
+                float: 'right',
+                background: '#ef4444',
+                color: 'white',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                cursor: 'pointer',
+                margin: '1rem',
+                zIndex: 10
+              }}
+            >
+              ✕
+            </button>
+            <ProntuarioDigital
+              pacienteId={pacienteSelecionado.paciente}
+              pacienteNome={pacienteSelecionado.paciente}
+              setorAtual={pacienteSelecionado.setor}
+            />
+          </div>
+        </div>
       )}
 
     </div>
