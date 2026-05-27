@@ -1,0 +1,187 @@
+/* Components/Modals/ModalEscolherWhatsApp.css */
+.modal-overlay-whats {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-container-whats {
+  background-color: white;
+  border-radius: 1.5rem;
+  width: 100%;
+  max-width: 28rem;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header-whats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 0 1.5rem;
+  position: relative;
+}
+
+.modal-icon-whats {
+  width: 48px;
+  height: 48px;
+  background: #e8f5e9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #25D366;
+}
+
+.btn-close-whats {
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.2s;
+}
+
+.btn-close-whats:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.modal-body-whats {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.modal-title-whats {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 0.75rem;
+}
+
+.modal-message-whats {
+  color: #475569;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.modal-message-whats strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.modal-options-whats {
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-whats-paciente,
+.btn-whats-responsavel {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 1rem;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: left;
+}
+
+.btn-whats-paciente {
+  border-left: 4px solid #25D366;
+}
+
+.btn-whats-responsavel {
+  border-left: 4px solid #128C7E;
+}
+
+.btn-whats-paciente:hover,
+.btn-whats-responsavel:hover {
+  background: #f8fafc;
+  transform: translateX(4px);
+  border-color: #cbd5e1;
+}
+
+.whats-option-icon {
+  font-size: 1.75rem;
+}
+
+.whats-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.whats-option-text strong {
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.whats-option-text span {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.modal-footer-whats {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+.btn-whats-voltar {
+  flex: 1;
+  padding: 0.75rem;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-whats-voltar:hover {
+  background: #e2e8f0;
+}
+
+.telefone-number {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+  display: block;
+  font-weight: normal;
+}
+
+@media (max-width: 640px) {
+  .telefone-number {
+    font-size: 0.7rem;
+  }
+}

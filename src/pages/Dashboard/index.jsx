@@ -14,6 +14,7 @@ import ModalConfirmarCancelamento from '../../Components/Modals/ModalConfirmarCa
 import ModalPerfil from '../../Components/Modals/ModalPerfil';
 import ModalEditarConsulta from '../../Components/Modals/ModalEditarConsulta';
 import ModalReagendarConsulta from '../../Components/Modals/ModalReagendarConsulta';
+import ModalEscolherWhatsApp from '../../Components/Modals/ModalEscolherWhatsApp';
 
 import '../../styles/Dashboard.css';
 
@@ -47,6 +48,8 @@ const Dashboard = () => {
   const [isModalReagendarOpen, setIsModalReagendarOpen] = useState(false);
   const [consultaParaCancelar, setConsultaParaCancelar] = useState(null);
   const [consultaSelecionada, setConsultaSelecionada] = useState(null);
+  const [isModalWhatsOpen, setIsModalWhatsOpen] = useState(false);
+  const [consultaWhatsApp, setConsultaWhatsApp] = useState(null);
 
   // --- Filtro de consultas ---
   const consultasFiltradas = consultas.filter(consulta => {
@@ -74,6 +77,11 @@ const Dashboard = () => {
     }
   };
 
+  const abrirWhatsApp = (consulta) => {
+    setConsultaWhatsApp(consulta);
+    setIsModalWhatsOpen(true);
+  };
+
   return (
     <div className="dashboard-container">
       <HeaderDashboard
@@ -97,6 +105,7 @@ const Dashboard = () => {
         onEditar={abrirEditarConsulta}
         onReagendar={abrirReagendarConsulta}
         onCancelar={setConsultaParaCancelar}
+        onWhatsApp={abrirWhatsApp}
         onImprimir={() => {}}
       />
 
@@ -140,6 +149,19 @@ const Dashboard = () => {
           onClose={() => { setIsModalReagendarOpen(false); setConsultaSelecionada(null); }}
           onSave={(reagendada) => { salvarReagendamento(consultaSelecionada, reagendada); setIsModalReagendarOpen(false); setConsultaSelecionada(null); }}
           consulta={consultaSelecionada}
+        />
+      )}
+      {isModalWhatsOpen && consultaWhatsApp && (
+        <ModalEscolherWhatsApp
+          consulta={consultaWhatsApp}
+          onClose={() => {
+            setIsModalWhatsOpen(false);
+            setConsultaWhatsApp(null);
+          }}
+          onConfirm={() => {
+            setIsModalWhatsOpen(false);
+            setConsultaWhatsApp(null);
+          }}
         />
       )}
     </div>

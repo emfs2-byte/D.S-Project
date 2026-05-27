@@ -11,6 +11,7 @@ const ConsultasTable = ({
   onReagendar,
   onCancelar,
   onImprimir,
+  onWhatsApp,
 }) => {
 
   const imprimirTicket = (consulta) => {
@@ -104,7 +105,8 @@ const ConsultasTable = ({
                 <button className="btn-action" title="Editar dados" onClick={() => onEditar(item)}>
                   <Pencil size={15} />
                 </button>
-                <button className="btn-action btn-whatsapp" onClick={() => alert(`WhatsApp para ${item.paciente}`)}>
+                <button className="btn-action btn-whatsapp" onClick={() => onWhatsApp(item)}
+                    title="WhatsApp">
                   <FaWhatsapp size={16} />
                 </button>
                 <button className="btn-action btn-print" onClick={() => imprimirTicket(item)}>
