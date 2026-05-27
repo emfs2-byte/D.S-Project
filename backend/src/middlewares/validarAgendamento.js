@@ -1,5 +1,4 @@
-// middlewares/validateAgendamento.js
-
+// middlewares/validarAgendamento.js
 const SETORES_VALIDOS = ['Odontologia', 'Cardiologia', 'Pediatria', 'Ortopedia']; // ajuste conforme seus setores
 
 function validarTelefone(tel) {
@@ -24,7 +23,7 @@ function validarHorario(horario) {
     return hora >= 8 && hora <= 18 && (minuto === 0 || minuto === 30);
 }
 
-exports.validateAgendamento = (req, res, next) => {
+exports.validarAgendamento = (req, res, next) => {
     const erros = [];
     const { nome_paciente, telefone_paciente, setor, data, horario } = req.body;
 
