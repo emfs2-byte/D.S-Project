@@ -9,7 +9,7 @@ O **CliniDesk** é uma solução moderna desenvolvida para centralizar e otimiza
 ## 📸 Demonstração do Sistema
 
 <p align="center">
-  <img src="src/assets/dashboard-preview.png" alt="Dashboard CliniDesk" width="100%" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+  <img src="Front/public/image_sistema.png" alt="Dashboard CliniDesk" width="100%" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
   <br>
   <i>* Insira o print do seu Dashboard na pasta <code>src/assets/dashboard-preview.png</code> para atualizar esta imagem *</i>
 </p>
