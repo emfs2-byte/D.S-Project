@@ -1,29 +1,45 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { agendarConsulta } from '../../lib/api';
+import DatePicker from 'react-datepicker';
+import { registerLocale } from "react-datepicker";
+import ptBR from 'date-fns/locale/pt-BR';
+import "react-datepicker/dist/react-datepicker.css";
+import { format } from 'date-fns';
 import './ModalNovoAgendamento.css';
 
-const dataDeHoje = new Date().toISOString().split('T')[0];
+registerLocale('pt-BR', ptBR);
 
 const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
+  //O único useState necessário fica aqui dentro, inicializando 'data' como objeto Date
   const [formData, setFormData] = useState({
     nome_paciente: '',
     responsavel: '',
     telefone_paciente: '',
     telefone_responsavel: '',
     setor: clinicas[0]?.nome || '',
-    data: dataDeHoje,
+    data: new Date(),
     horario: ''
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('🔵 HandleSubmit chamado');
-    console.log('📦 FormData:', formData);
 
     try {
+      console.log('📨 Preparando e higienizando dados para envio...');
+      
+      // Converte o objeto Date do react-datepicker para "AAAA-MM-DD" antes de ir para o Mongo
+      const dadosProntosParaOBanco = {
+        ...formData,
+        data: format(formData.data, 'yyyy-MM-dd')
+      };
+
+      console.log('📦 Dados estruturados enviados ao Backend:', dadosProntosParaOBanco);
+
       console.log('📨 Chamando agendarConsulta...');
-      const resultado = await agendarConsulta(formData);
+      const resultado = await agendarConsulta(dadosProntosParaOBanco);
+      
       console.log('✅ Sucesso:', resultado);
       alert("Agendamento salvo com sucesso no banco de dados!");
       onSave(resultado.agendamento || resultado);
@@ -92,7 +108,6 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
                 value={formData.setor}
                 onChange={(e) => setFormData({...formData, setor: e.target.value})}
               >
-                {/* Mapeamos a lista dinâmica */}
                 {clinicas.map((clinica, index) => (
                   <option key={index} value={clinica.nome}>
                     {clinica.nome}
@@ -103,12 +118,12 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
 
             <div className="input-group">
               <label className="input-label">Data *</label>
-              <input 
-                type="date"
-                required
-                className="form-input"
-                value={formData.data}
-                onChange={(e) => setFormData({...formData, data: e.target.value})}
+              <DatePicker
+                selected={formData.data}
+                onChange={(date) => setFormData({ ...formData, data: date })}
+                locale="pt-BR"
+                dateFormat="dd/MM/yyyy"
+                className="form-input" // Ajustado para usar o padrão visual dos outros campos
               />
             </div>
 

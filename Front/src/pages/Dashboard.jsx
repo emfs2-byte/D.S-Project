@@ -130,9 +130,19 @@ const salvarReagendamento = (consultaReagendada) => {
 };
 
   const getHorarioColor = (dataConsulta, horarioConsulta) => {
-    const [ano, mes, dia] = dataConsulta.split('-');
+    if (!dataConsulta || !horarioConsulta) return 'horario-normal';
+
+    // Se a data vier do MongoDB como ISO completo, extrai apenas o "AAAA-MM-DD"
+    const dataLimpa = dataConsulta.includes('T') ? dataConsulta.split('T')[0] : dataConsulta;
+
+    const [ano, mes, dia] = dataLimpa.split('-');
     const [hora, minuto] = horarioConsulta.split(':');
+    
     const dataHoraConsulta = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia), parseInt(hora), parseInt(minuto));
+    
+    // Proteção extra: se a data gerada for inválida por qualquer motivo, não quebra a tela
+    if (isNaN(dataHoraConsulta.getTime())) return 'horario-normal';
+
     const agora = new Date();
     const diferencaMinutos = differenceInMinutes(dataHoraConsulta, agora);
 
@@ -182,9 +192,19 @@ const salvarReagendamento = (consultaReagendada) => {
   }, []);
 
   const consultasFiltradas = consultas.filter(consulta => {
-    const dataFormatada = format(dataSelecionada, 'yyyy-MM-dd');
-    const matchesData = consulta.data === dataFormatada;
+    if (!consulta || !consulta.data) return false;
+
+    // Formata a data selecionada no calendário do topo do dashboard
+    const dataFormatadaSelecionada = format(dataSelecionada, 'yyyy-MM-dd');
+    
+    // Limpa a data do banco eliminando o padrão ISO ("2026-05-28T00..." vira "2026-05-28")
+    const dataConsultaLimpa = consulta.data.includes('T') 
+      ? consulta.data.split('T')[0] 
+      : consulta.data;
+
+    const matchesData = dataConsultaLimpa === dataFormatadaSelecionada;
     const matchesSetor = setorSelecionado === 'Todos os setores' || consulta.setor === setorSelecionado;
+    
     return matchesData && matchesSetor;
   });
 
