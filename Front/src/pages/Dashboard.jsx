@@ -2,11 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   Search, Calendar as CalendarIcon, Settings, Plus, LogOut, Menu, CheckCircle2, ChevronDown, Clock, Printer, Send, XCircle, CalendarClock,
   Pencil, Ban, User
-} from 'lucide-react'; // Adicionado User e XCircle
+} from 'lucide-react';
 import CliniDeskLogo from "../Components/Login/CliniDeskLogo";
 import ModalNovoAgendamento from '../Components/Modals/ModalNovoAgendamento';
 import ModalGerenciarClinicas from '../Components/Modals/ModalGerenciarClinicas';
 import ModalConfirmarCancelamento from '../Components/Modals/ModalConfirmarCancelamento';
+import ModalEscolherWhatsApp from '../Components/Modals/ModalEscolherWhatsApp';
 import '../styles/Dashboard.css';
 import { FaWhatsapp, FaPrint, FaTrash } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
@@ -105,6 +106,8 @@ const Dashboard = () => {
 
   const [isModalEditarOpen, setIsModalEditarOpen] = useState(false);
   const [consultaSelecionada, setConsultaSelecionada] = useState(null);
+  const [isModalWhatsOpen, setIsModalWhatsOpen] = useState(false);
+  const [consultaWhatsApp, setConsultaWhatsApp] = useState(null);
 
   const abrirEditarConsulta = (consulta) => {
     setConsultaSelecionada(consulta);
@@ -383,25 +386,7 @@ const salvarReagendamento = (consultaReagendada) => {
         ) : (
           consultasFiltradas.map((item, index) => {
             const consultaOriginalIndex = consultas.findIndex(c => c === item);
-            const handleWhatsApp = (item) => {
-            const telefoneBruto = item.telefone_paciente || "";
-            const numeroLimpo = String(telefoneBruto).replace(/\D/g, '');
-
-            if (!numeroLimpo) {
-                alert("Este paciente não possui um número de telefone cadastrado.");
-                return;
-            }
-
-            const setor = item.setor || 'nossa clínica';
-            const dataConsulta = item.data || 'sua data agendada';
-            const horaConsulta = item.horario || 'seu horário agendado';
-
-            const mensagem = `Olá, ${item.nome_paciente}! Sua consulta no setor de ${setor} está confirmada para o dia ${dataConsulta} às ${horaConsulta}.`;
-
-            const url = `https://wa.me/55${numeroLimpo}?text=${encodeURIComponent(mensagem)}`;
-
-            window.open(url, '_blank');
-        };
+            const horarioColor = getHorarioColor(item.data, item.horario);
             return (
               <div key={index} className={`table-row group ${item.lembrete_enviado_por ? 'lembrete-enviado' : ''}`}>
                 <div className="patient-name">{item.nome_paciente}</div>
@@ -455,7 +440,9 @@ const salvarReagendamento = (consultaReagendada) => {
                   >
                     <Pencil size={15} />
                   </button>
-                  <button className="btn-action btn-whatsapp" onClick={() => handleWhatsApp(item)}><FaWhatsapp size={16} /></button>
+                  <button className="btn-action btn-whatsapp" onClick={() => { setConsultaWhatsApp(item); setIsModalWhatsOpen(true); }} title="WhatsApp">
+                    <FaWhatsapp size={16} />
+                  </button>
                   <button className="btn-action btn-print" onClick={() => imprimirTicket(item)}><Printer size={14} /></button>
                   <button 
                     className="btn-action btn-delete" 
@@ -526,6 +513,21 @@ const salvarReagendamento = (consultaReagendada) => {
           }}
           onSave={salvarReagendamento}
           consulta={consultaSelecionada}
+        />
+      )}
+
+      {/* MODAL DE WHATSAPP */}
+      {isModalWhatsOpen && consultaWhatsApp && (
+        <ModalEscolherWhatsApp
+          consulta={consultaWhatsApp}
+          onClose={() => {
+            setIsModalWhatsOpen(false);
+            setConsultaWhatsApp(null);
+          }}
+          onConfirm={() => {
+            setIsModalWhatsOpen(false);
+            setConsultaWhatsApp(null);
+          }}
         />
       )}
 

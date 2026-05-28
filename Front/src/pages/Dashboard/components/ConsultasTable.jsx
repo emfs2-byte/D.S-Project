@@ -20,7 +20,7 @@ const ConsultasTable = ({
       <html>
         <body onload="window.print(); window.close();">
           <h1>CliniDesk</h1>
-          <p>Paciente: ${consulta.paciente}</p>
+          <p>Paciente: ${consulta.nome_paciente}</p>
           <p>Data: ${dataFormatada} - ${consulta.horario}</p>
         </body>
       </html>
