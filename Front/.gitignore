@@ -23,8 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# backend (NUNCA commitar na branch front)
-backend/
 
 # dependências
 node_modules/

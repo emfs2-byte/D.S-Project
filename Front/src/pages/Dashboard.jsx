@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import ModalPerfil from '../Components/Modals/ModalPerfil';
 import ModalEditarConsulta from '../Components/Modals/ModalEditarConsulta';
 import ModalReagendarConsulta from '../Components/Modals/ModalReagendarConsulta';
+import axios from 'axios';
 
 registerLocale('pt-BR', ptBR);
 
@@ -32,47 +33,13 @@ const Dashboard = () => {
   const [setorSelecionado, setSetorSelecionado] = useState('Todos os setores');
   const dropdownRef = useRef(null);
 
-  // Função para deslogar
-  const handleLogout = () => {
-    navigate('/');
-  };
+ // Função para deslogar limpa o token e volta para o login
+const handleLogout = () => {
+  localStorage.removeItem('@CliniDesk:token'); // Remove o token do navegador
+  navigate('/'); // Volta para a tela de login
+};
 
-  const [consultas, setConsultas] = useState([
-    {
-      nome_paciente: "Maria Silva",
-      responsavel: "João Silva",
-      telefone_paciente: "+55 (11) 99999-0001",
-      telefone_responsavel: "+55 (11) 98888-0001",
-      setor: "Geriatria",
-      data: "2026-04-21",
-      horario: "07:00",
-      lembrete_enviado_por: null,
-      lembrete_enviado_em: null
-    },
-    {
-      nome_paciente: "Pedro Santos",
-      responsavel: "Ana Santos",
-      telefone_paciente: "+55 (11) 99999-0002",
-      telefone_responsavel: "+55 (11) 98888-0002",
-      setor: "Clínica Médica",
-      data: "2026-04-21",
-      horario: "14:00",
-      lembrete_enviado_por: null,
-      lembrete_enviado_em: null
-    },
-    {
-      nome_paciente: "Luísa Oliveira",
-      responsavel: "Carlos Oliveira",
-      telefone_paciente: "-",
-      telefone_responsavel: "+55 (11) 98888-0003",
-      setor: "Nutrição",
-      data: "2026-04-21",
-      horario: "05:30",
-      lembrete_enviado_por: null,
-      lembrete_enviado_em: null
-    }
-  ]);
-
+  const [consultas, setConsultas] = useState([]);
   const [clinicas, setClinicas] = useState([
     { nome: "Geriatria", fixa: true },
     { nome: "Clínica Médica", fixa: true },
@@ -85,6 +52,29 @@ const Dashboard = () => {
     { nome: "Fonoaudiologia", fixa: true },
     { nome: "Odonto", fixa: true }
   ]);
+
+const puxarAgendamentosDoBanco = async () => {
+  try {
+    const token = localStorage.getItem('@CliniDesk:token');
+    if (!token) {
+      console.warn("Token não encontrado");
+      return;
+    }
+
+    const resposta = await axios.get('http://localhost:5000/api/pacientes/consultas', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    setConsultas(resposta.data || []);
+  } catch (error) {
+    console.error("Erro ao carregar consultas:", error);
+  }
+};
+
+// 2. O useEffect APENAS chama a função quando a tela carrega
+useEffect(() => {
+  puxarAgendamentosDoBanco();
+}, []);
 
   const [consultaParaCancelar, setConsultaParaCancelar] = useState(null);
   const abrirModalCancelamento = (consulta) => {
@@ -463,12 +453,16 @@ const salvarReagendamento = (consultaReagendada) => {
         <ModalNovoAgendamento
           onClose={() => setIsModalNovoOpen(false)}
           clinicas={clinicas}
-          onSave={(novoDado) => {
-            setConsultas([...consultas, { ...novoDado, lembrete_enviado_por: null, lembrete_enviado_em: null }]);
-            setIsModalNovoOpen(false);
+          onSave={() => {
+            // 1. Recarrega a lista trazendo os dados higienizados direto do MongoDB
+            puxarAgendamentosDoBanco(); 
+            
+            // 2. Fecha a janela do modal com segurança
+            setIsModalNovoOpen(false); 
           }}
         />
       )}
+
 
       {isModalClinicasOpen && (
         <ModalGerenciarClinicas

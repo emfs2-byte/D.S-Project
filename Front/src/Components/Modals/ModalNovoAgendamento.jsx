@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { agendarConsulta } from '../../lib/api';
 import './ModalNovoAgendamento.css';
 
-// 1. Recebemos 'clinicas' como prop do Dashboard
+const dataDeHoje = new Date().toISOString().split('T')[0];
+
 const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
   const [formData, setFormData] = useState({
     nome_paciente: '',
@@ -10,13 +12,25 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
     telefone_paciente: '',
     telefone_responsavel: '',
     setor: clinicas[0]?.nome || '',
-    data: '2026-04-17',
+    data: dataDeHoje,
     horario: ''
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave({ ...formData, status: '✔' });
+    console.log('🔵 HandleSubmit chamado');
+    console.log('📦 FormData:', formData);
+
+    try {
+      console.log('📨 Chamando agendarConsulta...');
+      const resultado = await agendarConsulta(formData);
+      console.log('✅ Sucesso:', resultado);
+      alert("Agendamento salvo com sucesso no banco de dados!");
+      onSave(resultado.agendamento || resultado);
+    } catch (error) {
+      console.error("❌ Erro ao salvar:", error);
+      alert("Erro ao salvar o agendamento. Verifique o console.");
+    }
   };
 
   return (
@@ -93,7 +107,7 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
                 type="date"
                 required
                 className="form-input"
-                defaultValue="2026-04-17"
+                value={formData.data}
                 onChange={(e) => setFormData({...formData, data: e.target.value})}
               />
             </div>
