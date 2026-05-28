@@ -5,11 +5,11 @@ import './ModalNovoAgendamento.css';
 // 1. Recebemos 'clinicas' como prop do Dashboard
 const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
   const [formData, setFormData] = useState({
-    paciente: '',
+    nome_paciente: '',
     responsavel: '',
-    telPaciente: '',
-    telResponsavel: '',
-    setor: clinicas[0]?.nome || '', // Define a primeira clínica da lista como padrão
+    telefone_paciente: '',
+    telefone_responsavel: '',
+    setor: clinicas[0]?.nome || '',
     data: '2026-04-17',
     horario: ''
   });
@@ -34,17 +34,17 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
           <div className="form-grid">
             <div className="input-group">
               <label className="input-label">Paciente *</label>
-              <input 
+              <input
                 required
                 className="form-input"
                 placeholder="Nome do paciente"
-                onChange={(e) => setFormData({...formData, paciente: e.target.value})}
+                onChange={(e) => setFormData({...formData, nome_paciente: e.target.value})}
               />
             </div>
 
             <div className="input-group">
               <label className="input-label">Responsável *</label>
-              <input 
+              <input
                 required
                 className="form-input"
                 placeholder="Nome do responsável"
@@ -54,20 +54,20 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
 
             <div className="input-group">
               <label className="input-label">Tel. Paciente</label>
-              <input 
+              <input
                 className="form-input"
                 placeholder="+55 (81) 99999-0000"
-                onChange={(e) => setFormData({...formData, telPaciente: e.target.value})}
+                onChange={(e) => setFormData({...formData, telefone_paciente: e.target.value})}
               />
             </div>
 
             <div className="input-group">
               <label className="input-label">Tel. Responsável *</label>
-              <input 
+              <input
                 required
                 className="form-input"
                 placeholder="+55 (81) 99999-0000"
-                onChange={(e) => setFormData({...formData, telResponsavel: e.target.value})}
+                onChange={(e) => setFormData({...formData, telefone_responsavel: e.target.value})}
               />
             </div>
 

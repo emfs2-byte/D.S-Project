@@ -1,15 +1,18 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./Components/Login/Login";
-import Dashboard from "./pages/Dashboard"; 
+import Dashboard from "./pages/Dashboard";
+import { ClinicasProvider } from "./contexts/ClinicasContext"; // ← import novo
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/home" element={<Dashboard />} />
-      </Routes>
-    </Router>
+    <ClinicasProvider> {/* ← envolve tudo */}
+      <Router>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/home" element={<Dashboard />} />
+        </Routes>
+      </Router>
+    </ClinicasProvider>
   );
 }
 

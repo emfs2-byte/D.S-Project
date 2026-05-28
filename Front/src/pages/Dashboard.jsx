@@ -38,40 +38,37 @@ const Dashboard = () => {
 
   const [consultas, setConsultas] = useState([
     {
-      paciente: "Maria Silva",
+      nome_paciente: "Maria Silva",
       responsavel: "João Silva",
-      telPaciente: "+55 (11) 99999-0001",
-      telResponsavel: "+55 (11) 98888-0001",
+      telefone_paciente: "+55 (11) 99999-0001",
+      telefone_responsavel: "+55 (11) 98888-0001",
       setor: "Geriatria",
       data: "2026-04-21",
       horario: "07:00",
-      status: "✔",
-      lembreteEnviadoPor: null,
-      lembreteEnviadoEm: null
+      lembrete_enviado_por: null,
+      lembrete_enviado_em: null
     },
     {
-      paciente: "Pedro Santos",
+      nome_paciente: "Pedro Santos",
       responsavel: "Ana Santos",
-      telPaciente: "+55 (11) 99999-0002",
-      telResponsavel: "+55 (11) 98888-0002",
+      telefone_paciente: "+55 (11) 99999-0002",
+      telefone_responsavel: "+55 (11) 98888-0002",
       setor: "Clínica Médica",
       data: "2026-04-21",
       horario: "14:00",
-      status: "✔",
-      lembreteEnviadoPor: null,
-      lembreteEnviadoEm: null
+      lembrete_enviado_por: null,
+      lembrete_enviado_em: null
     },
     {
-      paciente: "Luísa Oliveira",
+      nome_paciente: "Luísa Oliveira",
       responsavel: "Carlos Oliveira",
-      telPaciente: "-",
-      telResponsavel: "+55 (11) 98888-0003",
+      telefone_paciente: "-",
+      telefone_responsavel: "+55 (11) 98888-0003",
       setor: "Nutrição",
       data: "2026-04-21",
       horario: "05:30",
-      status: "✔",
-      lembreteEnviadoPor: null,
-      lembreteEnviadoEm: null
+      lembrete_enviado_por: null,
+      lembrete_enviado_em: null
     }
   ]);
 
@@ -155,12 +152,12 @@ const salvarReagendamento = (consultaReagendada) => {
     const novasConsultas = [...consultas];
     const consulta = novasConsultas[index];
 
-    if (consulta.lembreteEnviadoPor) {
-      consulta.lembreteEnviadoPor = null;
-      consulta.lembreteEnviadoEm = null;
+    if (consulta.lembrete_enviado_por) {
+      consulta.lembrete_enviado_por = null;
+      consulta.lembrete_enviado_em = null;
     } else {
-      consulta.lembreteEnviadoPor = nomeUsuario;
-      consulta.lembreteEnviadoEm = new Date().toLocaleString();
+      consulta.lembrete_enviado_por = nomeUsuario;
+      consulta.lembrete_enviado_em = new Date().toLocaleString();
     }
     setConsultas(novasConsultas);
   };
@@ -171,7 +168,7 @@ const salvarReagendamento = (consultaReagendada) => {
       <html>
         <body onload="window.print(); window.close();">
           <h1>CliniDesk</h1>
-          <p>Paciente: ${consulta.paciente}</p>
+          <p>Paciente: ${consulta.nome_paciente}</p>
           <p>Data: ${dataFormatada} - ${consulta.horario}</p>
         </body>
       </html>
@@ -385,10 +382,9 @@ const salvarReagendamento = (consultaReagendada) => {
           </div>
         ) : (
           consultasFiltradas.map((item, index) => {
-            const horarioColor = getHorarioColor(item.data, item.horario);
             const consultaOriginalIndex = consultas.findIndex(c => c === item);
             const handleWhatsApp = (item) => {
-            const telefoneBruto = item.telPaciente || ""; 
+            const telefoneBruto = item.telefone_paciente || "";
             const numeroLimpo = String(telefoneBruto).replace(/\D/g, '');
 
             if (!numeroLimpo) {
@@ -396,29 +392,26 @@ const salvarReagendamento = (consultaReagendada) => {
                 return;
             }
 
-            // Pega os dados da consulta 
             const setor = item.setor || 'nossa clínica';
             const dataConsulta = item.data || 'sua data agendada';
             const horaConsulta = item.horario || 'seu horário agendado';
 
-            // Mensagem de envio no whatszapp
-            const mensagem = `Olá, ${item.paciente}! Sua consulta no setor de ${setor} está confirmada para o dia ${dataConsulta} às ${horaConsulta}.`;
-            
+            const mensagem = `Olá, ${item.nome_paciente}! Sua consulta no setor de ${setor} está confirmada para o dia ${dataConsulta} às ${horaConsulta}.`;
+
             const url = `https://wa.me/55${numeroLimpo}?text=${encodeURIComponent(mensagem)}`;
 
-            // Abre a aba do WhatsApp
             window.open(url, '_blank');
         };
             return (
-              <div key={index} className={`table-row group ${item.lembreteEnviadoPor ? 'lembrete-enviado' : ''}`}>
-                <div className="patient-name">{item.paciente}</div>
+              <div key={index} className={`table-row group ${item.lembrete_enviado_por ? 'lembrete-enviado' : ''}`}>
+                <div className="patient-name">{item.nome_paciente}</div>
                 <div className="resp-name">{item.responsavel}</div>
                 <div className="contacts-cell">
-                  <span className="tel-paciente">{item.telPaciente}</span>
-                  <span className="tel-responsavel">{item.telResponsavel}</span>
+                  <span className="tel-paciente">{item.telefone_paciente}</span>
+                  <span className="tel-responsavel">{item.telefone_responsavel}</span>
                 </div>
                 <div>
-                  <span 
+                  <span
                     className="sector-badge"
                     style={{
                       backgroundColor: getSetorColor(item.setor).background,
@@ -440,8 +433,8 @@ const salvarReagendamento = (consultaReagendada) => {
                 <div className="status-cell">
                   <button
                     onClick={() => toggleLembrete(consultaOriginalIndex, "HJBC")}
-                    className={`status-circle ${item.lembreteEnviadoPor ? 'status-circle-enviado' : 'status-circle-pendente'}`}
-                    title={item.lembreteEnviadoPor ? "Desmarcar lembrete" : "Marcar como enviado"}
+                    className={`status-circle ${item.lembrete_enviado_por ? 'status-circle-enviado' : 'status-circle-pendente'}`}
+                    title={item.lembrete_enviado_por ? "Desmarcar lembrete" : "Marcar como enviado"}
                   >
                     <CheckCircle2 size={18} strokeWidth={3} />
                   </button>
@@ -484,7 +477,7 @@ const salvarReagendamento = (consultaReagendada) => {
           onClose={() => setIsModalNovoOpen(false)}
           clinicas={clinicas}
           onSave={(novoDado) => {
-            setConsultas([...consultas, { ...novoDado, lembreteEnviadoPor: null, lembreteEnviadoEm: null }]);
+            setConsultas([...consultas, { ...novoDado, lembrete_enviado_por: null, lembrete_enviado_em: null }]);
             setIsModalNovoOpen(false);
           }}
         />

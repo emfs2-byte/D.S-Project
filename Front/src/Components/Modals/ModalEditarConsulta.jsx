@@ -5,22 +5,20 @@ import './ModalNovoAgendamento.css';
 
 const ModalEditarConsulta = ({ onClose, onSave, consulta, clinicas }) => {
   const [formData, setFormData] = useState({
-    paciente: consulta.paciente,
+    nome_paciente: consulta.nome_paciente,
     responsavel: consulta.responsavel,
-    telPaciente: consulta.telPaciente || '',
-    telResponsavel: consulta.telResponsavel,
+    telefone_paciente: consulta.telefone_paciente || '',
+    telefone_responsavel: consulta.telefone_responsavel,
     setor: consulta.setor
-    // ❌ REMOVIDO: data e horario
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Mantém a data e horário ORIGINAIS da consulta
-    onSave({ 
-      ...formData, 
-      data: consulta.data,        // ← mantém original
-      horario: consulta.horario,  // ← mantém original
-      lembreteEnviadoPor: consulta.lembreteEnviadoPor 
+    onSave({
+      ...formData,
+      data: consulta.data,
+      horario: consulta.horario,
+      lembrete_enviado_por: consulta.lembrete_enviado_por
     });
   };
 
@@ -39,18 +37,18 @@ const ModalEditarConsulta = ({ onClose, onSave, consulta, clinicas }) => {
           <div className="form-grid">
             <div className="input-group">
               <label className="input-label">Paciente *</label>
-              <input 
+              <input
                 required
                 className="form-input"
-                value={formData.paciente}
+                value={formData.nome_paciente}
                 placeholder="Nome do paciente"
-                onChange={(e) => setFormData({...formData, paciente: e.target.value})}
+                onChange={(e) => setFormData({...formData, nome_paciente: e.target.value})}
               />
             </div>
 
             <div className="input-group">
               <label className="input-label">Responsável *</label>
-              <input 
+              <input
                 required
                 className="form-input"
                 value={formData.responsavel}
@@ -61,28 +59,28 @@ const ModalEditarConsulta = ({ onClose, onSave, consulta, clinicas }) => {
 
             <div className="input-group">
               <label className="input-label">Tel. Paciente</label>
-              <input 
+              <input
                 className="form-input"
-                value={formData.telPaciente}
+                value={formData.telefone_paciente}
                 placeholder="+55 (81) 99999-0000"
-                onChange={(e) => setFormData({...formData, telPaciente: e.target.value})}
+                onChange={(e) => setFormData({...formData, telefone_paciente: e.target.value})}
               />
             </div>
 
             <div className="input-group">
               <label className="input-label">Tel. Responsável *</label>
-              <input 
+              <input
                 required
                 className="form-input"
-                value={formData.telResponsavel}
+                value={formData.telefone_responsavel}
                 placeholder="+55 (81) 99999-0000"
-                onChange={(e) => setFormData({...formData, telResponsavel: e.target.value})}
+                onChange={(e) => setFormData({...formData, telefone_responsavel: e.target.value})}
               />
             </div>
 
             <div className="input-group full-width">
               <label className="input-label">Setor *</label>
-              <select 
+              <select
                 className="form-select"
                 value={formData.setor}
                 onChange={(e) => setFormData({...formData, setor: e.target.value})}
@@ -94,8 +92,6 @@ const ModalEditarConsulta = ({ onClose, onSave, consulta, clinicas }) => {
                 ))}
               </select>
             </div>
-
-            {/* ❌ REMOVIDOS: campos de DATA e HORÁRIO */}
 
           </div>
 

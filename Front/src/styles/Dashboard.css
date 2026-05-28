@@ -1,7 +1,7 @@
 /* Importação da fonte Inter para um ar profissional */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* --- CONFIGURAÇÕES GERAIS --- */
+
 .dashboard-container {
   min-height: 100vh;
   background-color: #f8fafc;
@@ -10,7 +10,6 @@
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* --- HEADER SUPERIOR --- */
 .dashboard-header {
   display: flex;
   align-items: center;
@@ -57,7 +56,6 @@
   color: #64748b;
 }
 
-/* --- LINHA DE TÍTULO E BOTÕES --- */
 .main-actions-row {
   display: flex !important;
   justify-content: space-between !important;
@@ -126,7 +124,6 @@
   box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
 }
 
-/* --- BARRA DE FILTROS (HORIZONTAL) --- */
 .filter-bar {
   display: flex !important;
   flex-direction: row !important;
@@ -169,7 +166,7 @@
 .table-header {
   display: grid !important;
   grid-template-columns: 1.5fr 1.2fr 1.2fr 1.2fr 0.8fr 0.8fr 2fr;
-  background-color: #0f172a; /* Azul marinho escuro */
+  background-color: #0f172a;
   color: white;
   padding: 1.2rem 1.5rem;
   font-size: 0.75rem;
@@ -196,7 +193,6 @@
   background-color: #f8fafc;
 }
 
-/* --- CÉLULAS ESPECÍFICAS --- */
 .patient-name { font-weight: 700; color: #000000; font-size: 1rem; }
 .resp-name { color: #737475; font-size: 0.9rem; }
 
@@ -207,13 +203,11 @@
   gap: 2px;
 }
 
-/* Telefone do Paciente (preto forte) */
 .contacts-cell .tel-paciente {
   color: #000000;
   font-weight: 500;
 }
 
-/* Telefone do Responsável (preto acizentado) */
 .contacts-cell .tel-responsavel {
   color: #737475;
 }
@@ -258,8 +252,6 @@
   50% { opacity: 0.3; transform: scale(0.8); }
 }
 
-/* --- STATUS E AÇÕES (CENTRALIZAÇÃO) --- */
-/* --- STATUS AJUSTADO --- */
 .status-cell {
   display: flex;
   justify-content: center;
@@ -275,20 +267,18 @@
   justify-content: center;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease-in-out; /* Transição suave */
+  transition: all 0.2s ease-in-out; 
 }
 
-/* Estado quando NÃO está marcado (Pendente) */
 .status-circle-pendente { 
   background: #f1f5f9; 
-  color: #cbd5e1; /* Check mark quase invisível (marca d'água) */
+  color: #cbd5e1;
 }
 
-/* Estado quando ESTÁ marcado (Verdinho vibrante) */
 .status-circle-enviado { 
-  background: #22c55e !important; /* Verde padrão sucesso */
-  color: #ffffff !important;      /* Check mark branco */
-  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.3); /* Sombra suave verde */
+  background: #22c55e !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.3);
 }
 
 .status-circle:hover { 
@@ -297,7 +287,7 @@
 
 .actions-cell {
   display: flex;
-  justify-content: center; /* Alinha ícones à direita */
+  justify-content: center;
   align-items: center;
   gap: 6px;
   width: 100%;
@@ -334,7 +324,6 @@
   color: #0ea5e9;
 }
 
-/* Helpers */
 .text-center { text-align: center !important;
 display: flex;
   justify-content: center;
@@ -347,7 +336,7 @@ display: flex;
   align-items: center;
   justify-content: center;
   padding: 40px;
-  color: #64748b; /* Um cinza azulado mais elegante */
+  color: #64748b;
   gap: 12px;
 }
 
@@ -363,7 +352,6 @@ display: flex;
   font-weight: 500;
 }
 
-/* EFEITOS NOS BOTOES DE "CLINICAS" E "NOVO" */
 .btn-clinicas, .btn-novo {
   transition: all 0.2s ease; 
   cursor: pointer;
@@ -388,9 +376,6 @@ display: flex;
   transform: rotate(45deg);
   transition: transform 0.3s ease;
 }
-
-
-/* --- AJUSTE DO DROPDOWN PARA NÃO MOVER O LAYOUT --- */
 
 .relative {
   position: relative;
@@ -431,8 +416,6 @@ display: flex;
   overflow: visible !important;   
 }
 
-/*  SISTEMA DE SIDEBAR  */
-
 .sidebar-overlay {
   position: fixed;
   top: 0;
@@ -452,7 +435,6 @@ display: flex;
   visibility: visible;
 }
 
-/* Caixa do Menu que desliza */
 .sidebar-menu {
   position: fixed;
   top: 0;
@@ -569,7 +551,6 @@ display: flex;
   stroke: #0061f2;
 }
 
-/* Botão de Sair no Rodapé  */
 .sidebar-logout {
   margin: 30px 10px;
   padding: 12px 25px;
@@ -818,7 +799,7 @@ display: flex;
   border-left: 3px solid #ef4444;
 }
 
-/* Linha inteira fica acinzentada quando lembrete foi enviado */
+
 .table-row.lembrete-enviado .patient-name,
 .table-row.lembrete-enviado .resp-name,
 .table-row.lembrete-enviado .contacts-cell,

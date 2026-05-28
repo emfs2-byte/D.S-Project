@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Aproveite para resetar margens padrão que podem atrapalhar */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
 }
