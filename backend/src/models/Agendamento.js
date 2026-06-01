@@ -4,6 +4,8 @@ const AgendamentoSchema = new mongoose.Schema({
   nome_paciente: {
     type: String,
     required: true,
+    trim: true,
+    match: [/^[A-Za-zÀ-ÿ\s'-]+$/,]
   },
   telefone_paciente: {
     type: String,

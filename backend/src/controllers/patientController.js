@@ -13,9 +13,9 @@ exports.agendarConsulta = async (req, res) => {
             responsavel,
             telefone_responsavel
         });
-
+        
         await novoAgendamento.save();
-
+        
         res.status(201).json({
             message: "Consulta agendada com sucesso!",
             agendamento: novoAgendamento
@@ -23,7 +23,15 @@ exports.agendarConsulta = async (req, res) => {
 
     } catch (error) {
         console.error("Erro ao agendar:", error);
-        res.status(500).json({ erro: "Erro interno ao salvar agendamento." });
+
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({
+                erro: "Nome inválido"
+            });
+        }
+        res.status(500).json({
+            erro: "Erro interno ao salvar agendamento."
+        });
     }
 };
 
