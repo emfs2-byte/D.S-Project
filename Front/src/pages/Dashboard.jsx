@@ -33,6 +33,8 @@ const Dashboard = () => {
   const [setorSelecionado, setSetorSelecionado] = useState('Todos os setores');
   const dropdownRef = useRef(null);
 
+  const [horaAtual, setHoraAtual] = useState(format(new Date(), 'HH:mm'));
+
  // Função para deslogar limpa o token e volta para o login
 const handleLogout = () => {
   localStorage.removeItem('@CliniDesk:token'); // Remove o token do navegador
@@ -73,18 +75,42 @@ const puxarAgendamentosDoBanco = async () => {
 
 // 2. O useEffect APENAS chama a função quando a tela carrega
 useEffect(() => {
-  puxarAgendamentosDoBanco();
-}, []);
+    puxarAgendamentosDoBanco();
+
+    const interval = setInterval(() => {
+      setHoraAtual(format(new Date(), 'HH:mm'));
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const [consultaParaCancelar, setConsultaParaCancelar] = useState(null);
+
   const abrirModalCancelamento = (consulta) => {
     setConsultaParaCancelar(consulta);
   };
 
-  const confirmarCancelamento = () => {
+  const confirmarCancelamento = async () => {
     if (consultaParaCancelar) {
-      setConsultas(consultas.filter(c => c !== consultaParaCancelar));
-      setConsultaParaCancelar(null);
+      try {
+        const token = localStorage.getItem('@CliniDesk:token');
+        if (!token) {
+          alert("Sessão expirada. Faça login novamente.");
+          return;
+        }
+
+        // Executa o DELETE passando o ID gerado pelo MongoDB (_id)
+        await axios.delete(`http://localhost:5000/api/pacientes/consultas/${consultaParaCancelar._id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        // Remove do estado local somente após a confirmação positiva do banco
+        setConsultas(consultas.filter(c => c._id !== consultaParaCancelar._id));
+        setConsultaParaCancelar(null);
+      } catch (error) {
+        console.error("Erro ao deletar consulta no servidor:", error);
+        alert("Não foi possível excluir o agendamento no banco de dados. Verifique a rota da API.");
+      }
     }
   };
 
@@ -194,17 +220,32 @@ const salvarReagendamento = (consultaReagendada) => {
   const consultasFiltradas = consultas.filter(consulta => {
     if (!consulta || !consulta.data) return false;
 
-    // Formata a data selecionada no calendário do topo do dashboard
-    const dataFormatadaSelecionada = format(dataSelecionada, 'yyyy-MM-dd');
+    // Padroniza as datas para comparação (AAAA-MM-DD)
+    const dataCalendarioFormatada = format(dataSelecionada, 'yyyy-MM-dd');
+    const hojeFormatado = format(new Date(), 'yyyy-MM-dd');
     
-    // Limpa a data do banco eliminando o padrão ISO ("2026-05-28T00..." vira "2026-05-28")
     const dataConsultaLimpa = consulta.data.includes('T') 
       ? consulta.data.split('T')[0] 
       : consulta.data;
 
-    const matchesData = dataConsultaLimpa === dataFormatadaSelecionada;
+    // Verifica se a consulta pertence ao dia selecionado no calendário
+    const matchesData = dataConsultaLimpa === dataCalendarioFormatada;
+    
+    // Filtro por setor
     const matchesSetor = setorSelecionado === 'Todos os setores' || consulta.setor === setorSelecionado;
     
+    
+    // Se a consulta for de um dia que JÁ PASSOU em relação a hoje, some com ela da tela
+    if (dataConsultaLimpa < hojeFormatado) {
+      return false;
+    }
+
+    // Se a data do calendário e da consulta for HOJE, esconde se o horário já passou
+    if (matchesData && dataConsultaLimpa === hojeFormatado) {
+      return matchesSetor && consulta.horario >= horaAtual;
+    }
+
+    // Para datas futuras selecionadas no calendário, mostra normalmente
     return matchesData && matchesSetor;
   });
 
