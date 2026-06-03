@@ -51,14 +51,22 @@ const Dashboard = () => {
   const [isModalWhatsOpen, setIsModalWhatsOpen] = useState(false);
   const [consultaWhatsApp, setConsultaWhatsApp] = useState(null);
 
-  // --- Filtro de consultas ---
-  const consultasFiltradas = consultas.filter(consulta => {
-    const dataFormatada = format(dataSelecionada, 'yyyy-MM-dd');
-    const matchesData = consulta.data === dataFormatada;
-    const matchesSetor = setorSelecionado === 'Todos os setores' || consulta.setor === setorSelecionado;
-    return matchesData && matchesSetor;
-  });
+ // Filtro de consultas para exibir apenas as do dia selecionado e do setor selecionado
+const consultasFiltradas = consultas.filter(consulta => {
+  if (!consulta || !consulta.data) return false;
 
+  const dataCalendarioFormatada = format(dataSelecionada, 'yyyy-MM-dd');
+
+  // Limpa o formato ISO do MongoDB (ex: 2026-06-04T00:00:00.000Z → 2026-06-04)
+  const dataConsultaLimpa = consulta.data.includes('T')
+    ? consulta.data.split('T')[0]
+    : consulta.data;
+
+  const matchesData = dataConsultaLimpa === dataCalendarioFormatada;
+  const matchesSetor = setorSelecionado === 'Todos os setores' || consulta.setor === setorSelecionado;
+
+  return matchesData && matchesSetor;
+});
   // --- Handlers de modal ---
   const abrirEditarConsulta = (consulta) => {
     setConsultaSelecionada(consulta);

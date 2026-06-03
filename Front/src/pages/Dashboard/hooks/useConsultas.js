@@ -1,33 +1,63 @@
-import { useState } from 'react';
-import { consultasMock } from '../../../data/consultasMock';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export const useConsultas = () => {
-  const [consultas, setConsultas] = useState(consultasMock);
+  const [consultas, setConsultas] = useState([]);
 
-  // Adiciona uma consulta nova
-  const adicionarConsulta = (novaConsulta) => {
-    setConsultas(anterior => [
-      ...anterior,
-      { ...novaConsulta, lembrete_enviado_por: null, lembrete_enviado_em: null }
-    ]);
+  // Busca as consultas do banco ao carregar
+  const buscarConsultas = async () => {
+    try {
+      const token = localStorage.getItem('@CliniDesk:token');
+      if (!token) {
+        console.warn('Token não encontrado');
+        return;
+      }
+
+      const resposta = await axios.get('http://localhost:5000/api/pacientes/consultas', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setConsultas(resposta.data || []);
+    } catch (error) {
+      console.error('Erro ao carregar consultas:', error);
+    }
   };
 
-  // Cancela (remove) uma consulta
-  const cancelarConsulta = (consultaAlvo) => {
-    setConsultas(anterior => anterior.filter(c => c !== consultaAlvo));
+  // Carrega ao montar o hook
+  useEffect(() => {
+    buscarConsultas();
+  }, []);
+
+  // Adiciona uma consulta nova (recarrega do banco para garantir dados atualizados)
+  const adicionarConsulta = async () => {
+    await buscarConsultas();
+  };
+
+  // Cancela (remove) uma consulta pelo _id do MongoDB
+  const cancelarConsulta = async (consultaAlvo) => {
+    try {
+      const token = localStorage.getItem('@CliniDesk:token');
+      await axios.delete(`http://localhost:5000/api/pacientes/consultas/${consultaAlvo._id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setConsultas(anterior => anterior.filter(c => c._id !== consultaAlvo._id));
+    } catch (error) {
+      console.error('Erro ao cancelar consulta:', error);
+      alert('Não foi possível cancelar o agendamento.');
+    }
   };
 
   // Salva edição de uma consulta existente
   const salvarEdicao = (consultaOriginal, consultaEditada) => {
     setConsultas(anterior =>
-      anterior.map(c => c === consultaOriginal ? consultaEditada : c)
+      anterior.map(c => c._id === consultaOriginal._id ? consultaEditada : c)
     );
   };
 
   // Reagenda uma consulta existente
   const salvarReagendamento = (consultaOriginal, consultaReagendada) => {
     setConsultas(anterior =>
-      anterior.map(c => c === consultaOriginal ? consultaReagendada : c)
+      anterior.map(c => c._id === consultaOriginal._id ? consultaReagendada : c)
     );
   };
 
@@ -49,7 +79,6 @@ export const useConsultas = () => {
     });
   };
 
-  // Retorna tudo que o Dashboard vai precisar usar
   return {
     consultas,
     adicionarConsulta,
