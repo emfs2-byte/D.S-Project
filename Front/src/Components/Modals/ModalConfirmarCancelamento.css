@@ -135,3 +135,66 @@
 .btn-cancel-confirmar:active {
   transform: translateY(0);
 }
+
+.whatsapp-obrigatorio-cancel {
+  padding: 1rem 1.5rem 1.5rem 1.5rem;
+  border-top: 1px solid #fee2e2;
+  background-color: #fef2f2;
+  text-align: center;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.whatsapp-obrigatorio-cancel p {
+  font-size: 0.875rem;
+  color: #dc2626;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.btn-whatsapp-enviar-obrigatorio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-whatsapp-enviar-obrigatorio:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+.btn-whatsapp-enviar-obrigatorio:active {
+  transform: translateY(0);
+}
+
+.btn-cancel-confirmar:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.btn-cancel-confirmar:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}

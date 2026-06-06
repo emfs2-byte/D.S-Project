@@ -1,10 +1,38 @@
 // Components/Modals/ModalConfirmarCancelamento.jsx
-import React from 'react';
-import { X, AlertTriangle } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, AlertTriangle, MessageCircle } from 'lucide-react';
 import './ModalConfirmarCancelamento.css';
 
 const ModalConfirmarCancelamento = ({ consulta, onClose, onConfirm }) => {
+  const [aguardandoWhatsApp, setAguardandoWhatsApp] = useState(false);
+  
   const dataFormatada = new Date(consulta.data).toLocaleDateString('pt-BR');
+  
+  const handleConfirmarClick = () => {
+    // Apenas desabilita o botão Confirmar e mostra área do WhatsApp
+    setAguardandoWhatsApp(true);
+  };
+
+  const handleWhatsAppClick = () => {
+    const numeroWhatsApp = consulta.telPaciente || consulta.telResponsavel;
+    
+    if (!numeroWhatsApp || numeroWhatsApp.trim() === '') {
+      alert('❌ Nenhum número de telefone cadastrado');
+      return;
+    }
+
+    const mensagem = `Olá! Sua consulta do dia ${dataFormatada} às ${consulta.horario} foi CANCELADA.`;
+
+    const numeroLimpo = numeroWhatsApp.replace(/\D/g, '');
+    const numeroCompleto = numeroLimpo.startsWith('55') ? numeroLimpo : `55${numeroLimpo}`;
+    const link = `https://wa.me/${numeroCompleto}?text=${encodeURIComponent(mensagem)}`;
+    
+    window.open(link, '_blank');
+    
+    // Após abrir o WhatsApp, confirma o cancelamento e fecha
+    onConfirm();
+    onClose();
+  };
   
   return (
     <div className="modal-overlay-cancel">
@@ -13,7 +41,11 @@ const ModalConfirmarCancelamento = ({ consulta, onClose, onConfirm }) => {
           <div className="modal-icon-cancel">
             <AlertTriangle size={28} />
           </div>
-          <button onClick={onClose} className="btn-close-cancel">
+          <button 
+            onClick={onClose} 
+            className="btn-close-cancel"
+            // X sempre funcionando
+          >
             <X size={20} />
           </button>
         </div>
@@ -26,13 +58,40 @@ const ModalConfirmarCancelamento = ({ consulta, onClose, onConfirm }) => {
         </div>
         
         <div className="modal-footer-cancel">
-          <button onClick={onClose} className="btn-cancel-voltar">
+          <button 
+            onClick={onClose} 
+            className="btn-cancel-voltar"
+            // Voltar sempre funcionando
+          >
             Voltar
           </button>
-          <button onClick={onConfirm} className="btn-cancel-confirmar">
+          
+          <button 
+            onClick={handleConfirmarClick}
+            className="btn-cancel-confirmar"
+            disabled={aguardandoWhatsApp}
+            style={{ 
+              opacity: aguardandoWhatsApp ? 0.5 : 1,
+              cursor: aguardandoWhatsApp ? 'not-allowed' : 'pointer'
+            }}
+          >
             Confirmar Cancelamento
           </button>
         </div>
+
+        {/* Área obrigatória do WhatsApp - aparece após clicar em Confirmar */}
+        {aguardandoWhatsApp && (
+          <div className="whatsapp-obrigatorio-cancel">
+            <p>⚠️ É obrigatório notificar o paciente para cancelar:</p>
+            <button 
+              onClick={handleWhatsAppClick}
+              className="btn-whatsapp-enviar-obrigatorio"
+            >
+              <MessageCircle size={20} />
+              Enviar notificação via WhatsApp
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 // Components/Modals/ModalReagendarConsulta.jsx
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, MessageCircle } from 'lucide-react';
 import './ModalNovoAgendamento.css';
 
 const ModalReagendarConsulta = ({ onClose, onSave, consulta }) => {
@@ -8,22 +8,54 @@ const ModalReagendarConsulta = ({ onClose, onSave, consulta }) => {
     data: consulta.data,
     horario: consulta.horario
   });
+  const [aguardandoWhatsApp, setAguardandoWhatsApp] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Mantém todos os dados originais, apenas atualiza data e horário
+  const handleWhatsAppClick = () => {
+    const numeroWhatsApp = consulta.telPaciente || consulta.telResponsavel;
+    
+    if (!numeroWhatsApp || numeroWhatsApp.trim() === '') {
+      alert('❌ Nenhum número de telefone cadastrado');
+      return;
+    }
+
+    const mensagem = `Olá! Sua consulta foi reagendada para ${formData.data} às ${formData.horario}.`;
+
+    const numeroLimpo = numeroWhatsApp.replace(/\D/g, '');
+    const numeroCompleto = numeroLimpo.startsWith('55') ? numeroLimpo : `55${numeroLimpo}`;
+    const link = `https://wa.me/${numeroCompleto}?text=${encodeURIComponent(mensagem)}`;
+    
+    window.open(link, '_blank');
+    
     onSave({ 
       ...consulta,
       data: formData.data,
       horario: formData.horario
     });
+    onClose();
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setAguardandoWhatsApp(true);
   };
 
   return (
     <div className="modal-overlay">
       <div className="modal-container">
         <div className="modal-header">
-          <button onClick={onClose} className="btn-close" style={{ position: 'absolute', right: '1.5rem', top: '1.5rem', color: 'white', background: 'none', border: 'none', cursor: 'pointer' }}>
+          <button 
+            onClick={onClose} 
+            className="btn-close"
+            style={{ 
+              position: 'absolute', 
+              right: '1.5rem', 
+              top: '1.5rem', 
+              color: 'white', 
+              background: 'none', 
+              border: 'none', 
+              cursor: 'pointer'
+            }}
+          >
             <X size={24} />
           </button>
           <h2 className="text-2xl font-bold">Reagendar Consulta</h2>
@@ -32,7 +64,6 @@ const ModalReagendarConsulta = ({ onClose, onSave, consulta }) => {
 
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="form-grid">
-            {/* APENAS DATA E HORÁRIO - SEM POLUIÇÃO VISUAL */}
             <div className="input-group full-width">
               <label className="input-label">Nova Data *</label>
               <input 
@@ -40,6 +71,11 @@ const ModalReagendarConsulta = ({ onClose, onSave, consulta }) => {
                 required
                 className="form-input"
                 value={formData.data}
+                disabled={aguardandoWhatsApp}
+                style={{ 
+                  backgroundColor: aguardandoWhatsApp ? '#e2e8f0' : '#f1f5f9',
+                  transition: 'all 0.2s ease'
+                }}
                 onChange={(e) => setFormData({...formData, data: e.target.value})}
               />
             </div>
@@ -51,20 +87,58 @@ const ModalReagendarConsulta = ({ onClose, onSave, consulta }) => {
                 required
                 className="form-input"
                 value={formData.horario}
+                disabled={aguardandoWhatsApp}
+                style={{ 
+                  backgroundColor: aguardandoWhatsApp ? '#e2e8f0' : '#f1f5f9',
+                  transition: 'all 0.2s ease'
+                }}
                 onChange={(e) => setFormData({...formData, horario: e.target.value})}
               />
             </div>
           </div>
 
           <div className="modal-footer">
+            <button 
+              type="button" 
+              onClick={handleWhatsAppClick}
+              className="btn-whatsapp-reagendar"
+              disabled={!aguardandoWhatsApp}
+              style={{
+                transition: 'all 0.2s ease',
+                opacity: !aguardandoWhatsApp ? 0.5 : 1,
+                cursor: !aguardandoWhatsApp ? 'not-allowed' : 'pointer'
+              }}
+            >
+              <MessageCircle size={20} />
+              Notificar WhatsApp
+            </button>
+            
+            <div style={{ flex: 1 }} />
+            
             <button type="button" onClick={onClose} className="btn-cancel">
               Cancelar
             </button>
-            <button type="submit" className="btn-submit">
+            <button 
+              type="submit" 
+              className="btn-submit"
+              disabled={aguardandoWhatsApp}
+              style={{
+                transition: 'all 0.2s ease',
+                opacity: aguardandoWhatsApp ? 0.5 : 1,
+                cursor: aguardandoWhatsApp ? 'not-allowed' : 'pointer'
+              }}
+            >
               Reagendar
             </button>
           </div>
         </form>
+
+        {aguardandoWhatsApp && (
+          <div className="whatsapp-obrigatorio-reagendar">
+            <p>⚠️ É obrigatório notificar o paciente sobre o reagendamento:</p>
+          </div>
+        )}
+
         <div style={{ textAlign: 'center', paddingBottom: '1rem', fontSize: '0.7rem', color: '#cbd5e1' }}>CliniDesk</div>
       </div>
     </div>
