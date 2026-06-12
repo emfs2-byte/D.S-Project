@@ -834,3 +834,73 @@ display: flex;
   background-color: #dc2626;
   transform: translateY(-2px);
 }
+
+/* GRID DA TABELA E CHECKBOXES */
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns: 50px 2fr 1.5fr 1.5fr 1fr 100px 80px 150px;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-cell {
+  width: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.checkbox-input {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  accent-color: #0284c7; /* Azul padrão do tema */
+}
+
+.center-header {
+  text-align: center;
+}
+
+.row-selecionada {
+  background-color: #f0f9ff !important;
+  border-left: 4px solid #0284c7;
+  transition: all 0.2s ease-in-out;
+}
+
+.row-selecionada:hover {
+  background-color: #e0f2fe !important; 
+}
+
+/*  PAINEL DE ENVIO EM LOTE*/
+.lote-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #e0f2fe;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.lote-text {
+  color: #0369a1;
+  font-weight: bold;
+}
+
+.lote-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #22c55e;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.lote-button:hover {
+  background-color: #16a34a;
+}

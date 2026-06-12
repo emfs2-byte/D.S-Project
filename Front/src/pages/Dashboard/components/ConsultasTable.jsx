@@ -12,6 +12,9 @@ const ConsultasTable = ({
   onCancelar,
   onImprimir,
   onWhatsApp,
+  selecionados = [],
+  onToggleSelecao,
+  onSelecionarTodos,
 }) => {
 
   const imprimirTicket = (consulta) => {
@@ -34,17 +37,27 @@ const ConsultasTable = ({
     janela.document.close();
   };
 
+  const todasSelecionadas = consultas.length > 0 && selecionados.length === consultas.length;
+
   return (
     <div className="table-container">
       {/* Cabeçalho da tabela */}
       <div className="table-header">
+        <div className="checkbox-cell">
+          <input
+            type="checkbox"
+            className="checkbox-input"
+            checked={todasSelecionadas}
+            onChange={onSelecionarTodos}
+          />
+        </div>
         <div>PACIENTE</div>
         <div>RESPONSÁVEL</div>
         <div>CONTATOS</div>
         <div>SETOR</div>
         <div>HORÁRIO</div>
-        <div style={{ textAlign: 'center' }}>STATUS</div>
-        <div style={{ textAlign: 'center' }}>AÇÕES</div>
+        <div className="center-header">STATUS</div>
+        <div className="center-header">AÇÕES</div>
       </div>
 
       {/* Estado vazio */}
@@ -57,12 +70,21 @@ const ConsultasTable = ({
         consultas.map((item, index) => {
           const horarioColor = getHorarioColor(item.data, item.horario);
           const setorColor = getSetorColor(item.setor);
+          const isSelecionado = selecionados.includes(item);
 
           return (
             <div
               key={index}
-              className={`table-row group ${item.lembrete_enviado_por ? 'lembrete-enviado' : ''}`}
+              className={`table-row group ${item.lembrete_enviado_por ? 'lembrete-enviado' : ''} ${isSelecionado ? 'row-selecionada' : ''}`}
             >
+              <div className="checkbox-cell">
+                <input
+                  type="checkbox"
+                  className="checkbox-input"
+                  checked={isSelecionado}
+                  onChange={() => onToggleSelecao(item)}
+                />
+              </div>
               <div className="patient-name">{item.nome_paciente}</div>
               <div className="resp-name">{item.responsavel}</div>
               <div className="contacts-cell">

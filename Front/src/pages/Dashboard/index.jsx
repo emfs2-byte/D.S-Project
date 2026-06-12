@@ -1,29 +1,30 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { registerLocale } from 'react-datepicker';
-import ptBR from 'date-fns/locale/pt-BR';
-import { format } from 'date-fns';
-import { useConsultas } from './hooks/useConsultas';
-import HeaderDashboard from './components/HeaderDashboard';
-import FiltroBar from './components/FiltroBar';
-import ConsultasTable from './components/ConsultasTable';
-import { useClinicas } from '../../contexts/ClinicasContext';
-import ModalNovoAgendamento from '../../Components/Modals/ModalNovoAgendamento';
-import ModalGerenciarClinicas from '../../Components/Modals/ModalGerenciarClinicas';
-import ModalConfirmarCancelamento from '../../Components/Modals/ModalConfirmarCancelamento';
-import ModalPerfil from '../../Components/Modals/ModalPerfil';
-import ModalEditarConsulta from '../../Components/Modals/ModalEditarConsulta';
-import ModalReagendarConsulta from '../../Components/Modals/ModalReagendarConsulta';
-import ModalEscolherWhatsApp from '../../Components/Modals/ModalEscolherWhatsApp';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { registerLocale } from "react-datepicker";
+import ptBR from "date-fns/locale/pt-BR";
+import { format } from "date-fns";
+import { useConsultas } from "./hooks/useConsultas";
+import HeaderDashboard from "./components/HeaderDashboard";
+import FiltroBar from "./components/FiltroBar";
+import ConsultasTable from "./components/ConsultasTable";
+import { useClinicas } from "../../contexts/ClinicasContext";
+import ModalNovoAgendamento from "../../Components/Modals/ModalNovoAgendamento";
+import ModalGerenciarClinicas from "../../Components/Modals/ModalGerenciarClinicas";
+import ModalConfirmarCancelamento from "../../Components/Modals/ModalConfirmarCancelamento";
+import ModalPerfil from "../../Components/Modals/ModalPerfil";
+import ModalEditarConsulta from "../../Components/Modals/ModalEditarConsulta";
+import ModalReagendarConsulta from "../../Components/Modals/ModalReagendarConsulta";
+import ModalEscolherWhatsApp from "../../Components/Modals/ModalEscolherWhatsApp";
+import ModalEnvioLote from "../../Components/Modals/ModalEnvioLote";
+import { FaWhatsapp } from "react-icons/fa";
 
-import '../../styles/Dashboard.css';
+import "../../styles/Dashboard.css";
 
-registerLocale('pt-BR', ptBR);
+registerLocale("pt-BR", ptBR);
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  // --- Hook de consultas ---
   const {
     consultas,
     adicionarConsulta,
@@ -33,61 +34,46 @@ const Dashboard = () => {
     toggleLembrete,
   } = useConsultas();
 
-  // --- Contexto de clínicas (corrigido: desestruturado aqui) ---
   const { clinicas, setClinicas } = useClinicas();
 
-  // --- Estados de filtro ---
   const [dataSelecionada, setDataSelecionada] = useState(new Date());
-  const [setorSelecionado, setSetorSelecionado] = useState('Todos os setores');
+  const [setorSelecionado, setSetorSelecionado] = useState("Todos os setores");
+  const [selecionados, setSelecionados] = useState([]);
 
-  // --- Estados de modais ---
+  // Estados de modais
   const [isModalNovoOpen, setIsModalNovoOpen] = useState(false);
   const [isModalClinicasOpen, setIsModalClinicasOpen] = useState(false);
   const [isModalPerfilOpen, setIsModalPerfilOpen] = useState(false);
   const [isModalEditarOpen, setIsModalEditarOpen] = useState(false);
   const [isModalReagendarOpen, setIsModalReagendarOpen] = useState(false);
+  const [isModalWhatsOpen, setIsModalWhatsOpen] = useState(false);
+  const [isModalLoteOpen, setIsModalLoteOpen] = useState(false);
+  
   const [consultaParaCancelar, setConsultaParaCancelar] = useState(null);
   const [consultaSelecionada, setConsultaSelecionada] = useState(null);
-  const [isModalWhatsOpen, setIsModalWhatsOpen] = useState(false);
   const [consultaWhatsApp, setConsultaWhatsApp] = useState(null);
 
- // Filtro de consultas para exibir apenas as do dia selecionado e do setor selecionado
-const consultasFiltradas = consultas.filter(consulta => {
-  if (!consulta || !consulta.data) return false;
+  const consultasFiltradas = consultas.filter((consulta) => {
+    if (!consulta || !consulta.data) return false;
+    const dataCalendarioFormatada = format(dataSelecionada, "yyyy-MM-dd");
+    const dataConsultaLimpa = consulta.data.includes("T") ? consulta.data.split("T")[0] : consulta.data;
+    const matchesData = dataConsultaLimpa === dataCalendarioFormatada;
+    const matchesSetor = setorSelecionado === "Todos os setores" || consulta.setor === setorSelecionado;
+    return matchesData && matchesSetor;
+  });
 
-  const dataCalendarioFormatada = format(dataSelecionada, 'yyyy-MM-dd');
+  useEffect(() => {
+    setSelecionados([]);
+  }, [dataSelecionada, setorSelecionado]);
 
-  // Limpa o formato ISO do MongoDB (ex: 2026-06-04T00:00:00.000Z → 2026-06-04)
-  const dataConsultaLimpa = consulta.data.includes('T')
-    ? consulta.data.split('T')[0]
-    : consulta.data;
-
-  const matchesData = dataConsultaLimpa === dataCalendarioFormatada;
-  const matchesSetor = setorSelecionado === 'Todos os setores' || consulta.setor === setorSelecionado;
-
-  return matchesData && matchesSetor;
-});
-  // --- Handlers de modal ---
-  const abrirEditarConsulta = (consulta) => {
-    setConsultaSelecionada(consulta);
-    setIsModalEditarOpen(true);
+  const handleToggleSelecao = (consulta) => {
+    setSelecionados((prev) =>
+      prev.includes(consulta) ? prev.filter((c) => c !== consulta) : [...prev, consulta]
+    );
   };
 
-  const abrirReagendarConsulta = (consulta) => {
-    setConsultaSelecionada(consulta);
-    setIsModalReagendarOpen(true);
-  };
-
-  const confirmarCancelamento = () => {
-    if (consultaParaCancelar) {
-      cancelarConsulta(consultaParaCancelar);
-      setConsultaParaCancelar(null);
-    }
-  };
-
-  const abrirWhatsApp = (consulta) => {
-    setConsultaWhatsApp(consulta);
-    setIsModalWhatsOpen(true);
+  const handleSelecionarTodos = () => {
+    setSelecionados(selecionados.length === consultasFiltradas.length && consultasFiltradas.length > 0 ? [] : [...consultasFiltradas]);
   };
 
   return (
@@ -95,7 +81,7 @@ const consultasFiltradas = consultas.filter(consulta => {
       <HeaderDashboard
         totalConsultas={consultasFiltradas.length}
         dataSelecionada={dataSelecionada}
-        onLogout={() => navigate('/')}
+        onLogout={() => navigate("/")}
         onAbrirClinicas={() => setIsModalClinicasOpen(true)}
         onAbrirNovoAgendamento={() => setIsModalNovoOpen(true)}
       />
@@ -107,71 +93,40 @@ const consultasFiltradas = consultas.filter(consulta => {
         onSetorChange={setSetorSelecionado}
       />
 
+      {/* Painel Único de Ação em Lote */}
+      {selecionados.length > 0 && (
+        <div className="lote-panel">
+          <span className="lote-text">
+            {selecionados.length} paciente(s) selecionado(s)
+          </span>
+          <button className="lote-button" onClick={() => setIsModalLoteOpen(true)}>
+            <FaWhatsapp size={18} /> Enviar Lembretes em Lote
+          </button>
+        </div>
+      )}
+
       <ConsultasTable
         consultas={consultasFiltradas}
         onToggleLembrete={toggleLembrete}
-        onEditar={abrirEditarConsulta}
-        onReagendar={abrirReagendarConsulta}
+        onEditar={(c) => { setConsultaSelecionada(c); setIsModalEditarOpen(true); }}
+        onReagendar={(c) => { setConsultaSelecionada(c); setIsModalReagendarOpen(true); }}
         onCancelar={setConsultaParaCancelar}
-        onWhatsApp={abrirWhatsApp}
-        onImprimir={() => {}}
+        onWhatsApp={(c) => { setConsultaWhatsApp(c); setIsModalWhatsOpen(true); }}
+        selecionados={selecionados}
+        onToggleSelecao={handleToggleSelecao}
+        onSelecionarTodos={handleSelecionarTodos}
       />
 
       {/* Modais */}
-      {isModalNovoOpen && (
-        <ModalNovoAgendamento
-          onClose={() => setIsModalNovoOpen(false)}
-          clinicas={clinicas}
-          onSave={(nova) => { adicionarConsulta(nova); setIsModalNovoOpen(false); }}
-        />
-      )}
-      {isModalClinicasOpen && (
-        <ModalGerenciarClinicas
-          onClose={() => setIsModalClinicasOpen(false)}
-          clinicas={clinicas}
-          setClinicas={setClinicas}
-        />
-      )}
-      <ModalPerfil
-        isOpen={isModalPerfilOpen}
-        onClose={() => setIsModalPerfilOpen(false)}
-        onLogout={() => navigate('/')}
-      />
-      {consultaParaCancelar && (
-        <ModalConfirmarCancelamento
-          consulta={consultaParaCancelar}
-          onClose={() => setConsultaParaCancelar(null)}
-          onConfirm={confirmarCancelamento}
-        />
-      )}
-      {isModalEditarOpen && consultaSelecionada && (
-        <ModalEditarConsulta
-          onClose={() => { setIsModalEditarOpen(false); setConsultaSelecionada(null); }}
-          onSave={(editada) => { salvarEdicao(consultaSelecionada, editada); setIsModalEditarOpen(false); setConsultaSelecionada(null); }}
-          consulta={consultaSelecionada}
-          clinicas={clinicas}
-        />
-      )}
-      {isModalReagendarOpen && consultaSelecionada && (
-        <ModalReagendarConsulta
-          onClose={() => { setIsModalReagendarOpen(false); setConsultaSelecionada(null); }}
-          onSave={(reagendada) => { salvarReagendamento(consultaSelecionada, reagendada); setIsModalReagendarOpen(false); setConsultaSelecionada(null); }}
-          consulta={consultaSelecionada}
-        />
-      )}
-      {isModalWhatsOpen && consultaWhatsApp && (
-        <ModalEscolherWhatsApp
-          consulta={consultaWhatsApp}
-          onClose={() => {
-            setIsModalWhatsOpen(false);
-            setConsultaWhatsApp(null);
-          }}
-          onConfirm={() => {
-            setIsModalWhatsOpen(false);
-            setConsultaWhatsApp(null);
-          }}
-        />
-      )}
+      {isModalLoteOpen && <ModalEnvioLote selecionados={selecionados} onClose={() => setIsModalLoteOpen(false)} />}
+      
+      {isModalNovoOpen && <ModalNovoAgendamento onClose={() => setIsModalNovoOpen(false)} clinicas={clinicas} onSave={(nova) => { adicionarConsulta(nova); setIsModalNovoOpen(false); }} />}
+      {isModalClinicasOpen && <ModalGerenciarClinicas onClose={() => setIsModalClinicasOpen(false)} clinicas={clinicas} setClinicas={setClinicas} />}
+      <ModalPerfil isOpen={isModalPerfilOpen} onClose={() => setIsModalPerfilOpen(false)} onLogout={() => navigate("/")} />
+      {consultaParaCancelar && <ModalConfirmarCancelamento consulta={consultaParaCancelar} onClose={() => setConsultaParaCancelar(null)} onConfirm={confirmarCancelamento} />}
+      {isModalEditarOpen && consultaSelecionada && <ModalEditarConsulta onClose={() => { setIsModalEditarOpen(false); setConsultaSelecionada(null); }} onSave={(editada) => { salvarEdicao(consultaSelecionada, editada); setIsModalEditarOpen(false); setConsultaSelecionada(null); }} consulta={consultaSelecionada} clinicas={clinicas} />}
+      {isModalReagendarOpen && consultaSelecionada && <ModalReagendarConsulta onClose={() => { setIsModalReagendarOpen(false); setConsultaSelecionada(null); }} onSave={(reagendada) => { salvarReagendamento(consultaSelecionada, reagendada); setIsModalReagendarOpen(false); setConsultaSelecionada(null); }} consulta={consultaSelecionada} />}
+      {isModalWhatsOpen && consultaWhatsApp && <ModalEscolherWhatsApp consulta={consultaWhatsApp} onClose={() => { setIsModalWhatsOpen(false); setConsultaWhatsApp(null); }} onConfirm={() => { setIsModalWhatsOpen(false); setConsultaWhatsApp(null); }} />}
     </div>
   );
 };
