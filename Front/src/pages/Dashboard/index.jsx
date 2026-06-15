@@ -17,6 +17,7 @@ import ModalReagendarConsulta from "../../Components/Modals/ModalReagendarConsul
 import ModalEscolherWhatsApp from "../../Components/Modals/ModalEscolherWhatsApp";
 import ModalEnvioLote from "../../Components/Modals/ModalEnvioLote";
 import { FaWhatsapp } from "react-icons/fa";
+import axios from "axios";
 
 import "../../styles/Dashboard.css";
 
@@ -52,6 +53,32 @@ const Dashboard = () => {
   const [consultaParaCancelar, setConsultaParaCancelar] = useState(null);
   const [consultaSelecionada, setConsultaSelecionada] = useState(null);
   const [consultaWhatsApp, setConsultaWhatsApp] = useState(null);
+  const [abaAtiva, setAbaAtiva] = useState('retornos');
+  const [retornos, setRetornos] = useState([]);
+
+  const puxarRetornosDoBanco = async () => {
+  try {
+    const token = localStorage.getItem('@CliniDesk:token');
+    if (!token) return;
+
+    // Garante a formatação correta YYYY-MM-DD
+    const dataFormatada = format(dataSelecionada, "yyyy-MM-dd");
+
+    const resposta = await axios.get(`http://localhost:5000/api/pacientes/consultas/retornos?data=${dataFormatada}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    setRetornos(resposta.data || []);
+  } catch (error) {
+    console.error("Erro ao carregar os retornos do banco:", error);
+  }
+};
+
+  useEffect(() => {
+    if (abaAtiva === 'retornos') {
+      puxarRetornosDoBanco();
+    }
+  }, [dataSelecionada, abaAtiva]); // Executa sempre que mudar o dia ou clicar na aba
 
   const consultasFiltradas = consultas.filter((consulta) => {
     if (!consulta || !consulta.data) return false;
@@ -105,8 +132,44 @@ const Dashboard = () => {
         </div>
       )}
 
+      <div className="tabs-container" style={{ display: 'flex', gap: '15px', margin: '15px 0', borderBottom: '1px solid #e2e8f0' }}>
+        <button 
+          className={`tab-btn ${abaAtiva === 'consultas' ? 'active' : ''}`}
+          onClick={() => setAbaAtiva('consultas')}
+          style={{
+            padding: '10px 15px',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            background: 'none',
+            border: 'none',
+            color: abaAtiva === 'consultas' ? '#2563eb' : '#64748b',
+            borderBottom: abaAtiva === 'consultas' ? '3px solid #2563eb' : '3px solid transparent'
+          }}
+        >
+          Consultas do Dia ({consultasFiltradas.length})
+        </button>
+        <button 
+          className={`tab-btn ${abaAtiva === 'retornos' ? 'active' : ''}`}
+          onClick={() => setAbaAtiva('retornos')}
+          style={{
+            padding: '10px 15px',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            background: 'none',
+            border: 'none',
+            color: abaAtiva === 'retornos' ? '#2563eb' : '#64748b',
+            borderBottom: abaAtiva === 'retornos' ? '3px solid #2563eb' : '3px solid transparent'
+          }}
+        >
+          Retornos Agendados ({retornos.length})
+        </button>
+      </div>
+
       <ConsultasTable
-        consultas={consultasFiltradas}
+        consultas={abaAtiva === 'consultas' ? consultasFiltradas : retornos} 
+        abaAtiva={abaAtiva} 
         onToggleLembrete={toggleLembrete}
         onEditar={(c) => { setConsultaSelecionada(c); setIsModalEditarOpen(true); }}
         onReagendar={(c) => { setConsultaSelecionada(c); setIsModalReagendarOpen(true); }}

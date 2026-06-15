@@ -8,10 +8,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import { format } from 'date-fns';
 import './ModalNovoAgendamento.css';
 
+
 registerLocale('pt-BR', ptBR);
 
 const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
-  //O único useState necessário fica aqui dentro, inicializando 'data' como objeto Date
   const [formData, setFormData] = useState({
     nome_paciente: '',
     responsavel: '',
@@ -19,28 +19,22 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
     telefone_responsavel: '',
     setor: clinicas[0]?.nome || '',
     data: new Date(),
-    horario: ''
+    horario: '',
+    dataRetorno: "",
+    observacaoRetorno: ""
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('🔵 HandleSubmit chamado');
 
     try {
-      console.log('📨 Preparando e higienizando dados para envio...');
-      
-      // Converte o objeto Date do react-datepicker para "AAAA-MM-DD" antes de ir para o Mongo
       const dadosProntosParaOBanco = {
         ...formData,
         data: format(formData.data, 'yyyy-MM-dd')
       };
 
-      console.log('📦 Dados estruturados enviados ao Backend:', dadosProntosParaOBanco);
-
-      console.log('📨 Chamando agendarConsulta...');
       const resultado = await agendarConsulta(dadosProntosParaOBanco);
       
-      console.log('✅ Sucesso:', resultado);
       alert("Agendamento salvo com sucesso no banco de dados!");
       onSave(resultado.agendamento || resultado);
     } catch (error) {
@@ -123,7 +117,7 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
                 onChange={(date) => setFormData({ ...formData, data: date })}
                 locale="pt-BR"
                 dateFormat="dd/MM/yyyy"
-                className="form-input" // Ajustado para usar o padrão visual dos outros campos
+                className="form-input"
               />
             </div>
 
@@ -138,7 +132,36 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
             </div>
           </div>
 
-          <div className="modal-footer">
+          <div className="retorno-section" style={{ marginTop: '20px', paddingTop: '15px', borderTop: '1px dashed #cbd5e1' }}>
+            <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#334155', marginBottom: '10px' }}>
+              Configuração de Retorno (Opcional)
+            </h4>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+              <div className="form-group">
+                <label style={{ fontWeight: '500', display: 'block', marginBottom: '5px', fontSize: '13px' }}>Data do Retorno</label>
+                <input 
+                  type="date" 
+                  className="form-input"
+                  value={formData.dataRetorno} 
+                  onChange={(e) => setFormData({ ...formData, dataRetorno: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group">
+                <label style={{ fontWeight: '500', display: 'block', marginBottom: '5px', fontSize: '13px' }}>Observações</label>
+                <input 
+                  type="text" 
+                  className="form-input"
+                  placeholder="Ex: Trazer exames de sangue"
+                  value={formData.observacaoRetorno} 
+                  onChange={(e) => setFormData({ ...formData, observacaoRetorno: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-footer" style={{ marginTop: '20px' }}>
             <button type="button" onClick={onClose} className="btn-cancel">
               Cancelar
             </button>

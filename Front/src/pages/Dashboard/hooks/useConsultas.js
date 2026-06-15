@@ -29,8 +29,21 @@ export const useConsultas = () => {
   }, []);
 
   // Adiciona uma consulta nova (recarrega do banco para garantir dados atualizados)
-  const adicionarConsulta = async () => {
-    await buscarConsultas();
+  const adicionarConsulta = async (novaConsulta) => {
+    try {
+      const token = localStorage.getItem('@CliniDesk:token');
+      
+      const resposta = await axios.post('http://localhost:5000/api/pacientes/consultas', novaConsulta, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // Atualiza o estado local das consultas do dia corrente
+      setConsultas(prev => [...prev, resposta.data]);
+      return true; 
+    } catch (error) {
+      console.error("Erro ao cadastrar agendamento:", error);
+      return false; 
+    }
   };
 
   // Cancela (remove) uma consulta pelo _id do MongoDB
@@ -81,6 +94,7 @@ export const useConsultas = () => {
 
   return {
     consultas,
+    buscarConsultas,
     adicionarConsulta,
     cancelarConsulta,
     salvarEdicao,

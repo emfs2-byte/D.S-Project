@@ -4,17 +4,17 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { getHorarioColor, getSetorColor } from '../../../lib/utils';
 import { format } from 'date-fns';
 
-const ConsultasTable = ({
-  consultas,
-  onToggleLembrete,
-  onEditar,
-  onReagendar,
-  onCancelar,
-  onImprimir,
-  onWhatsApp,
-  selecionados = [],
-  onToggleSelecao,
-  onSelecionarTodos,
+const ConsultasTable = ({ 
+  consultas, 
+  abaAtiva, 
+  onToggleLembrete, 
+  onEditar, 
+  onReagendar, 
+  onCancelar, 
+  onWhatsApp, 
+  selecionados, 
+  onToggleSelecao, 
+  onSelecionarTodos 
 }) => {
 
   const imprimirTicket = (consulta) => {
@@ -35,6 +35,24 @@ const ConsultasTable = ({
     }
     janela.document.write(conteudo);
     janela.document.close();
+  };
+  const enviarWhatsAppRetorno = (item) => {
+    const telefone = item.telefone_paciente || item.telefone_responsavel || '';
+    if (!telefone) {
+      alert("Nenhum telefone encontrado para este paciente.");
+      return;
+    }
+
+    // Corrigindo o fuso horário do MongoDB 
+    const dataLimpa = item.dataRetorno.includes('T') ? item.dataRetorno.split('T')[0] : item.dataRetorno;
+    const [ano, mes, dia] = dataLimpa.split('-');
+    const dataRetornoBR = `${dia}/${mes}/${ano}`;
+
+    const mensagem = `Olá ${item.nome_paciente}! Lembramos que seu retorno com ${item.setor} está marcado para ${dataRetornoBR} às ${item.horario}. Núcleo de Apoio ao Idoso. Confirme sua presença!`;
+    
+    const link = `https://api.whatsapp.com/send?phone=55${telefone.replace(/\D/g, '')}&text=${encodeURIComponent(mensagem)}`;
+    
+    window.open(link, '_blank');
   };
 
   const todasSelecionadas = consultas.length > 0 && selecionados.length === consultas.length;
@@ -85,7 +103,14 @@ const ConsultasTable = ({
                   onChange={() => onToggleSelecao(item)}
                 />
               </div>
-              <div className="patient-name">{item.nome_paciente}</div>
+              <div className="patient-cell">
+                <span className="patient-name-text">{item.nome_paciente}</span>
+                {item.dataRetorno && (
+                  <span className="badge-retorno">
+                    Retorno Confirmado
+                  </span>
+                )}
+              </div>
               <div className="resp-name">{item.responsavel}</div>
               <div className="contacts-cell">
                 <span className="tel-paciente">{item.telefone_paciente}</span>
@@ -127,8 +152,19 @@ const ConsultasTable = ({
                 <button className="btn-action" title="Editar dados" onClick={() => onEditar(item)}>
                   <Pencil size={15} />
                 </button>
-                <button className="btn-action btn-whatsapp" onClick={() => onWhatsApp(item)}
-                    title="WhatsApp">
+                <button 
+                  className="btn-action btn-whatsapp" 
+                  title="Enviar WhatsApp"
+                  onClick={() => {
+                    if (abaAtiva === 'consultas') {
+                      // Se for a aba normal, executa a prop original que abre o Modal de escolha (index.jsx)
+                      onWhatsApp(item); 
+                    } else {
+                      // Se for a aba de retornos, dispara o link direto com o texto customizado para retorno
+                      enviarWhatsAppRetorno(item); 
+                    }
+                  }}
+                >
                   <FaWhatsapp size={16} />
                 </button>
                 <button className="btn-action btn-print" onClick={() => imprimirTicket(item)}>
