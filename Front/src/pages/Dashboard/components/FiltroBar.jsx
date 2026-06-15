@@ -59,7 +59,7 @@ const FiltroBar = ({
             <div onClick={() => { onSetorChange('Todos os setores'); setIsSelectSetorOpen(false); }}>
               Todos os setores
             </div>
-            {clinicas.map((clinica, idx) => (
+            {clinicas?.map((clinica, idx) => (  
               <div
                 key={idx}
                 onClick={() => { onSetorChange(clinica.nome); setIsSelectSetorOpen(false); }}

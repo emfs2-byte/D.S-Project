@@ -103,6 +103,16 @@ const Dashboard = () => {
     setSelecionados(selecionados.length === consultasFiltradas.length && consultasFiltradas.length > 0 ? [] : [...consultasFiltradas]);
   };
 
+  const confirmarCancelamento = async (consulta) => {
+    try {
+      await cancelarConsulta(consulta.id);
+      setConsultaParaCancelar(null);
+    } catch (error) {
+      console.error("Erro ao cancelar consulta:", error);
+      alert("Erro ao cancelar consulta. Tente novamente.");
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <HeaderDashboard
