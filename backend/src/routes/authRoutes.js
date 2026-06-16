@@ -10,5 +10,6 @@ router.post('/login', loginLimiter, authController.login);
 // Quando o frontend chamar um GET para /me, o Express vai rodar o middleware 'auth' primeiro.
 // Se o token estiver correto e não expirado, ele avança para o 'authController.getMe'.
 router.get('/me', auth, authController.getMe);
+router.post('/logout', auth, authController.logout);
 
 module.exports = router;
