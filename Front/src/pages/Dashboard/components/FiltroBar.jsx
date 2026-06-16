@@ -9,6 +9,7 @@ const FiltroBar = ({
   setorSelecionado,
   onSetorChange,
   clinicas,
+  onBuscarChange
 }) => {
   const [isSelectSetorOpen, setIsSelectSetorOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -29,7 +30,9 @@ const FiltroBar = ({
       {/* Campo de busca */}
       <div className="search-input-group">
         <Search size={20} />
-        <input type="text" placeholder="Buscar por paciente ou telefone..." />
+        <input type="text" placeholder="Buscar por paciente ou telefone..."
+          onChange={(e) => onBuscarChange(e.target.value)}
+        />
       </div>
 
       {/* Seletor de data */}

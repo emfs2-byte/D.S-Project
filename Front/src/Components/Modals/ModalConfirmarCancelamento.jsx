@@ -14,7 +14,7 @@ const ModalConfirmarCancelamento = ({ consulta, onClose, onConfirm }) => {
   };
 
   const handleWhatsAppClick = () => {
-    const numeroWhatsApp = consulta.telPaciente || consulta.telResponsavel;
+    const numeroWhatsApp = consulta.telefone_paciente || consulta.telefone_responsavel;
     
     if (!numeroWhatsApp || numeroWhatsApp.trim() === '') {
       alert('❌ Nenhum número de telefone cadastrado');
@@ -53,7 +53,7 @@ const ModalConfirmarCancelamento = ({ consulta, onClose, onConfirm }) => {
         <div className="modal-body-cancel">
           <h3 className="modal-title-cancel">Cancelar consulta?</h3>
           <p className="modal-message-cancel">
-            Deseja cancelar a consulta de <strong>{consulta.paciente}</strong> agendada para <strong>{dataFormatada}</strong> às <strong>{consulta.horario}</strong>?
+            Deseja cancelar a consulta de <strong>{consulta.nome_paciente}</strong> agendada para <strong>{dataFormatada}</strong> às <strong>{consulta.horario}</strong>?
           </p>
         </div>
         

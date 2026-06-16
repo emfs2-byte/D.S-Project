@@ -11,7 +11,7 @@ const ModalReagendarConsulta = ({ onClose, onSave, consulta }) => {
   const [aguardandoWhatsApp, setAguardandoWhatsApp] = useState(false);
 
   const handleWhatsAppClick = () => {
-    const numeroWhatsApp = consulta.telPaciente || consulta.telResponsavel;
+    const numeroWhatsApp = consulta.telefone_paciente || consulta.telefone_responsavel;
     
     if (!numeroWhatsApp || numeroWhatsApp.trim() === '') {
       alert('❌ Nenhum número de telefone cadastrado');

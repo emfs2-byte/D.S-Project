@@ -49,7 +49,7 @@ const Dashboard = () => {
   const [isModalReagendarOpen, setIsModalReagendarOpen] = useState(false);
   const [isModalWhatsOpen, setIsModalWhatsOpen] = useState(false);
   const [isModalLoteOpen, setIsModalLoteOpen] = useState(false);
-  
+  const [buscaTexto, setBuscaTexto] = useState('');
   const [consultaParaCancelar, setConsultaParaCancelar] = useState(null);
   const [consultaSelecionada, setConsultaSelecionada] = useState(null);
   const [consultaWhatsApp, setConsultaWhatsApp] = useState(null);
@@ -86,7 +86,11 @@ const Dashboard = () => {
     const dataConsultaLimpa = consulta.data.includes("T") ? consulta.data.split("T")[0] : consulta.data;
     const matchesData = dataConsultaLimpa === dataCalendarioFormatada;
     const matchesSetor = setorSelecionado === "Todos os setores" || consulta.setor === setorSelecionado;
-    return matchesData && matchesSetor;
+    const matchesBusca = buscaTexto.trim() === '' ||
+      consulta.nome_paciente?.toLowerCase().includes(buscaTexto.toLowerCase()) ||
+      consulta.telefone_paciente?.includes(buscaTexto) ||
+      consulta.telefone_responsavel?.includes(buscaTexto);
+    return matchesData && matchesSetor && matchesBusca;
   });
 
   useEffect(() => {
@@ -105,7 +109,7 @@ const Dashboard = () => {
 
   const confirmarCancelamento = async (consulta) => {
     try {
-      await cancelarConsulta(consulta.id);
+      await cancelarConsulta(consultaParaCancelar);
       setConsultaParaCancelar(null);
     } catch (error) {
       console.error("Erro ao cancelar consulta:", error);
@@ -128,6 +132,8 @@ const Dashboard = () => {
         onDataChange={setDataSelecionada}
         setorSelecionado={setorSelecionado}
         onSetorChange={setSetorSelecionado}
+        clinicas={clinicas}
+        onBuscarChange={setBuscaTexto}
       />
 
       {/* Painel Único de Ação em Lote */}
