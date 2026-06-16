@@ -60,18 +60,55 @@ export const useConsultas = () => {
     }
   };
 
-  // Salva edição de uma consulta existente
-  const salvarEdicao = (consultaOriginal, consultaEditada) => {
-    setConsultas(anterior =>
-      anterior.map(c => c._id === consultaOriginal._id ? consultaEditada : c)
-    );
+  // Salva edição de uma consulta existente direto no banco de dados
+  const salvarEdicao = async (idConsulta, dadosAtualizados) => {
+    try {
+      const token = localStorage.getItem('@CliniDesk:token');
+      
+      // Faz a requisição PUT enviando o ID na URL e as alterações no body
+      const resposta = await axios.put(`http://localhost:5000/api/pacientes/consultas/${idConsulta}`, dadosAtualizados, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // O backend retorna o agendamento atualizado dentro de resposta.data.agendamento
+      const consultaAtualizadaDoBanco = resposta.data.agendamento;
+
+      // Atualiza o estado do React substituindo apenas a consulta modificada
+      setConsultas(anterior =>
+        anterior.map(c => c._id === idConsulta ? consultaAtualizadaDoBanco : c)
+      );
+
+      return true;
+    } catch (error) {
+      console.error('Erro ao salvar edição da consulta:', error);
+      alert('Não foi possível atualizar as alterações no servidor.');
+      return false;
+    }
   };
 
-  // Reagenda uma consulta existente
-  const salvarReagendamento = (consultaOriginal, consultaReagendada) => {
-    setConsultas(anterior =>
-      anterior.map(c => c._id === consultaOriginal._id ? consultaReagendada : c)
-    );
+  // Reagenda uma consulta existente direto no banco de dados
+  const salvarReagendamento = async (idConsulta, dadosReagendados) => {
+    try {
+      const token = localStorage.getItem('@CliniDesk:token');
+      
+      // Envia as novas informações de data/horário para o backend
+      const resposta = await axios.put(`http://localhost:5000/api/pacientes/consultas/${idConsulta}`, dadosReagendados, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const consultaAtualizadaDoBanco = resposta.data.agendamento;
+
+      // Atualiza o estado local do React com a nova data/horário
+      setConsultas(anterior =>
+        anterior.map(c => c._id === idConsulta ? consultaAtualizadaDoBanco : c)
+      );
+
+      return true;
+    } catch (error) {
+      console.error('Erro ao salvar reagendamento da consulta:', error);
+      alert('Não foi possível atualizar o reagendamento no servidor.');
+      return false;
+    }
   };
 
   // Liga/desliga o lembrete de uma consulta

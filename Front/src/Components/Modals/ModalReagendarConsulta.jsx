@@ -26,8 +26,7 @@ const ModalReagendarConsulta = ({ onClose, onSave, consulta }) => {
     
     window.open(link, '_blank');
     
-    onSave({ 
-      ...consulta,
+    onSave(consulta._id, {
       data: formData.data,
       horario: formData.horario
     });

@@ -2,7 +2,7 @@ const Agendamento = require('../models/Agendamento');
 
 exports.agendarConsulta = async (req, res) => {
     try {
-        const { nome_paciente, telefone_paciente, setor, data, horario, responsavel, telefone_responsavel } = req.body;
+        const { nome_paciente, telefone_paciente, setor, data, horario, responsavel, telefone_responsavel, dataRetorno, observacaoRetorno } = req.body;
 
         const novoAgendamento = new Agendamento({
             nome_paciente,
@@ -11,7 +11,9 @@ exports.agendarConsulta = async (req, res) => {
             data,
             horario,
             responsavel,
-            telefone_responsavel
+            telefone_responsavel,
+            dataRetorno,
+            observacaoRetorno
         });
         
         await novoAgendamento.save();

@@ -14,7 +14,7 @@ const ModalEditarConsulta = ({ onClose, onSave, consulta, clinicas }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({
+    onSave(consulta._id, {
       ...formData,
       data: consulta.data,
       horario: consulta.horario,
