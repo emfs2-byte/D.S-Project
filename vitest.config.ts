@@ -10,12 +10,9 @@ export default defineConfig({
     // Simula o ambiente de navegador para testes de componentes React
     environment: 'jsdom', 
     
-    // Define onde os testes estão localizados
-    include: [
-      'Front/src/**/*.{test,spec}.{ts,tsx,js,jsx}',
-      'backend/src/**/*.{test,spec}.{ts,tsx,js,jsx}'
-    ],
-    
+    // Define onde os testes estão localizados 
+    include: ['**/*.{test,spec}.{js,jsx,ts,tsx}'],
+
     // Configurações de cobertura de código
     coverage: {
       provider: 'v8',

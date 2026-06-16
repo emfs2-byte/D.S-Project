@@ -18,8 +18,7 @@ const Login = () => {
     setErro('');
 
     try {
-      const response = await api.post('/auth/login', { username, password });
-      localStorage.setItem('@CliniDesk:token', response.data.token);
+      await api.post('/auth/login', { username, password })
       navigate("/home"); 
     } catch (err) {
       setErro(err.response?.data?.error || "Erro ao conectar com o servidor");

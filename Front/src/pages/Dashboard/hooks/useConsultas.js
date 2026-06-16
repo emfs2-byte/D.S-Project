@@ -1,22 +1,12 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-
+import api from '../../../lib/api';
 export const useConsultas = () => {
   const [consultas, setConsultas] = useState([]);
 
   // Busca as consultas do banco ao carregar
   const buscarConsultas = async () => {
     try {
-      const token = localStorage.getItem('@CliniDesk:token');
-      if (!token) {
-        console.warn('Token não encontrado');
-        return;
-      }
-
-      const resposta = await axios.get('http://localhost:5000/api/pacientes/consultas', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
+      const resposta = await api.get('/pacientes/consultas');
       setConsultas(resposta.data || []);
     } catch (error) {
       console.error('Erro ao carregar consultas:', error);
@@ -29,30 +19,21 @@ export const useConsultas = () => {
   }, []);
 
   // Adiciona uma consulta nova (recarrega do banco para garantir dados atualizados)
-  const adicionarConsulta = async (novaConsulta) => {
+   const adicionarConsulta = async (novaConsulta) => {
     try {
-      const token = localStorage.getItem('@CliniDesk:token');
-      
-      const resposta = await axios.post('http://localhost:5000/api/pacientes/consultas', novaConsulta, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      // Atualiza o estado local das consultas do dia corrente
+      const resposta = await api.post('/pacientes/consultas', novaConsulta);
       setConsultas(prev => [...prev, resposta.data]);
-      return true; 
+      return true;
     } catch (error) {
       console.error("Erro ao cadastrar agendamento:", error);
-      return false; 
+      return false;
     }
   };
 
   // Cancela (remove) uma consulta pelo _id do MongoDB
-  const cancelarConsulta = async (consultaAlvo) => {
+   const cancelarConsulta = async (consultaAlvo) => {
     try {
-      const token = localStorage.getItem('@CliniDesk:token');
-      await axios.delete(`http://localhost:5000/api/pacientes/consultas/${consultaAlvo._id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/pacientes/consultas/${consultaAlvo._id}`);
       setConsultas(anterior => anterior.filter(c => c._id !== consultaAlvo._id));
     } catch (error) {
       console.error('Erro ao cancelar consulta:', error);
