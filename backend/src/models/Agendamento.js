@@ -30,6 +30,14 @@ const AgendamentoSchema = new mongoose.Schema({
   horario: {
     type: String,
     required: true,
+  },
+  dataRetorno: {
+    type: Date,
+    default: null
+  },
+  observacaoRetorno: {
+    type: String,
+    default: null
   }
 }, {
   timestamps: true

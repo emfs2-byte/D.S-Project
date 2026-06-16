@@ -84,3 +84,56 @@ exports.cancelarConsulta = async (req, res) => {
         res.status(500).json({ erro: "Erro ao cancelar consulta." });
     }
 };
+
+exports.salvarRetorno = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { dataRetorno, observacaoRetorno } = req.body;
+
+        const consultaAtualizada = await Agendamento.findByIdAndUpdate(
+            id,
+            { dataRetorno, observacaoRetorno },
+            { new: true, runValidators: true }
+        );
+
+        if (!consultaAtualizada) {
+            return res.status(404).json({ erro: "Consulta não encontrada." });
+        }
+
+        res.status(200).json({
+            message: "Retorno registrado com sucesso!",
+            agendamento: consultaAtualizada
+        });
+    } catch (error) {
+        console.error("Erro ao salvar retorno:", error);
+        res.status(500).json({ erro: "Erro ao registrar data de retorno." });
+    }
+};
+
+exports.getRetornos = async (req, res) => {
+    try {
+        const { data } = req.query;
+
+        if (!data) {
+            return res.status(400).json({ erro: "O parâmetro 'data' é obrigatório no formato YYYY-MM-DD." });
+        }
+
+        const inicioDoDia = new Date(data);
+        inicioDoDia.setUTCHours(0, 0, 0, 0);
+
+        const fimDoDia = new Date(data);
+        fimDoDia.setUTCHours(23, 59, 59, 999);
+
+        const retornos = await Agendamento.find({
+            dataRetorno: {
+                $gte: inicioDoDia,
+                $lte: fimDoDia
+            }
+        }).sort({ horario: 1 });
+
+        res.status(200).json(retornos);
+    } catch (error) {
+        console.error("Erro ao buscar retornos:", error);
+        res.status(500).json({ erro: "Erro interno ao buscar lista de retornos." });
+    }
+};
