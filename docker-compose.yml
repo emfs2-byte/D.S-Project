@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: ./backend
+    container_name: clinidesk-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/usr/src
+      - /usr/src/app/node_modules
+
+  frontend:
+    build:
+      context: ./Front 
+    container_name: clinidesk-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      # O frontend só precisa saber onde a API está rodando
+      - VITE_API_URL=http://localhost:5000/api
+    depends_on:
+      - backend
+    volumes:
+      - ./Front:/usr/src/app 
+      - /usr/src/app/node_modules
