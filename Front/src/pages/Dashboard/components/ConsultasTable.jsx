@@ -1,5 +1,4 @@
-import { Search, CheckCircle2, CalendarClock, Pencil, Ban } from 'lucide-react';
-import { Printer } from 'lucide-react';
+import { Search, CheckCircle2, CalendarClock, Pencil, Ban, Printer } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
 import { getHorarioColor, getSetorColor } from '../../../lib/utils';
 import { format } from 'date-fns';
@@ -18,13 +17,14 @@ const ConsultasTable = ({
 }) => {
 
   const imprimirTicket = (consulta) => {
-    const dataFormatada = format(new Date(consulta.data), 'dd/MM/yyyy');
+    const dataFormatada = format(new Date(consulta.data || consulta.dataRetorno || Date.now()), 'dd/MM/yyyy');
+    const horarioImprimir = consulta.horarioRetorno || consulta.horario || '';
     const conteudo = `
       <html>
         <body onload="window.print(); window.close();">
           <h1>CliniDesk</h1>
-          <p>Paciente: ${consulta.nome_paciente}</p>
-          <p>Data: ${dataFormatada} - ${consulta.horario}</p>
+          <p>Paciente: ${consulta.nome_paciente || ''}</p>
+          <p>Data: ${dataFormatada} - ${horarioImprimir}</p>
         </body>
       </html>
     `;
@@ -39,23 +39,34 @@ const ConsultasTable = ({
   const enviarWhatsAppRetorno = (item) => {
     const telefone = item.telefone_paciente || item.telefone_responsavel || '';
     if (!telefone) {
-      alert("Nenhum telefone encontrado para este paciente.");
+      alert('Nenhum telefone encontrado para este paciente.');
       return;
     }
 
-    // Corrigindo o fuso horário do MongoDB 
-    const dataLimpa = item.dataRetorno.includes('T') ? item.dataRetorno.split('T')[0] : item.dataRetorno;
-    const [ano, mes, dia] = dataLimpa.split('-');
-    const dataRetornoBR = `${dia}/${mes}/${ano}`;
+    const rawData = item.dataRetorno || item.data || '';
+    const dataLimpa = rawData && rawData.includes('T') ? rawData.split('T')[0] : rawData;
+    let dataRetornoBR = '';
+    if (dataLimpa) {
+      const parts = dataLimpa.split('-');
+      if (parts.length === 3) {
+        const [ano, mes, dia] = parts;
+        dataRetornoBR = `${dia}/${mes}/${ano}`;
+      } else {
+        dataRetornoBR = dataLimpa;
+      }
+    }
 
-    const mensagem = `Olá ${item.nome_paciente}! Lembramos que seu retorno com ${item.setor} está marcado para ${dataRetornoBR} às ${item.horario}. Núcleo de Apoio ao Idoso. Confirme sua presença!`;
+    const horarioDoRetorno = item.horarioRetorno || item.horario || '';
+    const setorDoRetorno = item.setorRetorno || item.setor || '';
+
+    const mensagem = `Olá ${item.nome_paciente || ''}! Lembramos que seu retorno com ${setorDoRetorno} está marcado para ${dataRetornoBR} às ${horarioDoRetorno}. Núcleo de Apoio ao Idoso. Confirme sua presença!`;
     
     const link = `https://api.whatsapp.com/send?phone=55${telefone.replace(/\D/g, '')}&text=${encodeURIComponent(mensagem)}`;
     
     window.open(link, '_blank');
   };
 
-  const todasSelecionadas = consultas.length > 0 && selecionados.length === consultas.length;
+  const todasSelecionadas = Array.isArray(consultas) && consultas.length > 0 && Array.isArray(selecionados) && selecionados.length === consultas.length;
 
   return (
     <div className="table-container">
@@ -86,13 +97,23 @@ const ConsultasTable = ({
         </div>
       ) : (
         consultas.map((item, index) => {
-          const horarioColor = getHorarioColor(item.data, item.horario);
-          const setorColor = getSetorColor(item.setor);
-          const isSelecionado = selecionados.includes(item);
+          const horarioExibido = abaAtiva === 'retornos' ? (item.horarioRetorno || item.horario) : item.horario;
+          const setorExibido = abaAtiva === 'retornos' ? (item.setorRetorno || item.setor) : item.setor;
+
+          const horarioColor = getHorarioColor(item.data || item.dataRetorno, horarioExibido);
+          const setorColor = getSetorColor(setorExibido);
+
+          const isSelecionado = Array.isArray(selecionados) && selecionados.some(s => {
+            if (!s) return false;
+            if (typeof s === 'string' || typeof s === 'number') return (s === item._id || s === item.id || s === item.telefone_paciente);
+            return (s === item || (s._id && item._id && s._id === item._id) || (s.id && item.id && s.id === item.id));
+          });
+
+          const key = item._id || item.id || index;
 
           return (
             <div
-              key={index}
+              key={key}
               className={`table-row group ${item.lembrete_enviado_por ? 'lembrete-enviado' : ''} ${isSelecionado ? 'row-selecionada' : ''}`}
             >
               <div className="checkbox-cell">
@@ -121,7 +142,7 @@ const ConsultasTable = ({
                   className="sector-badge"
                   style={{ backgroundColor: setorColor.background, color: setorColor.color }}
                 >
-                  {item.setor}
+                  {setorExibido}
                 </span>
               </div>
               <div>
@@ -129,14 +150,14 @@ const ConsultasTable = ({
                   {horarioColor === 'horario-atrasado' && (
                     <span className="alert-blink"></span>
                   )}
-                  {item.horario}
+                  {horarioExibido}
                 </span>
               </div>
 
               {/* Botão de lembrete */}
               <div className="status-cell">
                 <button
-                  onClick={() => onToggleLembrete(index, 'Sistema')}
+                  onClick={() => onToggleLembrete(item, 'Sistema')}
                   className={`status-circle ${item.lembrete_enviado_por ? 'status-circle-enviado' : 'status-circle-pendente'}`}
                   title={item.lembrete_enviado_por ? 'Desmarcar lembrete' : 'Marcar como enviado'}
                 >
