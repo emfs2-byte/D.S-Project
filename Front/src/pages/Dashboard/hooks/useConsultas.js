@@ -1,22 +1,12 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-
+import api from '../../../lib/api';
 export const useConsultas = () => {
   const [consultas, setConsultas] = useState([]);
 
   // Busca as consultas do banco ao carregar
   const buscarConsultas = async () => {
     try {
-      const token = localStorage.getItem('@CliniDesk:token');
-      if (!token) {
-        console.warn('Token não encontrado');
-        return;
-      }
-
-      const resposta = await axios.get('http://localhost:5000/api/pacientes/consultas', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
+      const resposta = await api.get('/pacientes/consultas');
       setConsultas(resposta.data || []);
     } catch (error) {
       console.error('Erro ao carregar consultas:', error);
@@ -28,45 +18,39 @@ export const useConsultas = () => {
     buscarConsultas();
   }, []);
 
- const adicionarConsulta = async (novaConsulta) => {
+  // Adiciona uma consulta nova (recarrega do banco para garantir dados atualizados)
+   const adicionarConsulta = async (novaConsulta) => {
     try {
-      const token = localStorage.getItem('@CliniDesk:token');
-      
-      await axios.post('http://localhost:5000/api/pacientes/consultas', novaConsulta, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      await buscarConsultas(); 
-      
-      return true; 
+      const resposta = await api.post('/pacientes/consultas', novaConsulta);
+      setConsultas(prev => [...prev, resposta.data]);
+      return true;
     } catch (error) {
       console.error("Erro ao cadastrar agendamento:", error);
-      return false; 
+      return false;
     }
   };
 
-  const cancelarConsulta = async (consultaAlvo) => {
-    try {
-      const token = localStorage.getItem('@CliniDesk:token');
-      const isRetorno = consultaAlvo.tipo === 'Retorno';
-      const url = isRetorno
-        ? `http://localhost:5000/api/pacientes/consultas/retornos/${consultaAlvo._id}`
-        : `http://localhost:5000/api/pacientes/consultas/${consultaAlvo._id}`;
+  // Cancela (remove) uma consulta pelo _id do MongoDB
+const cancelarConsulta = async (consultaAlvo) => {
+  try {
+    // Mantém a regra de negócio da branch main
+    const isRetorno = consultaAlvo.tipo === 'Retorno';
+    const url = isRetorno 
+      ? `/pacientes/consultas/retornos/${consultaAlvo._id}` 
+      : `/pacientes/consultas/${consultaAlvo._id}`;
 
-      await axios.delete(url, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    // Usa a instância 'api' da branch auth-cookies
+    await api.delete(url);
+    
+    // Atualiza o estado local para remover o item da tela
+    setConsultas(anterior => anterior.filter(c => c._id !== consultaAlvo._id));
 
-      if (!isRetorno) {
-        await buscarConsultas();
-      }
-      return true; 
-    } catch (error) {
-      console.error('Erro ao cancelar consulta:', error);
-      alert('Não foi possível cancelar o agendamento.');
-      return false; 
-    }
-  };
+  } catch (error) {
+    console.error("Erro ao cancelar consulta:", error);
+    alert('Não foi possível cancelar o agendamento.');
+    return false;
+  }
+};
 
   // Salva edição de uma consulta existente direto no banco de dados
   const salvarEdicao = async (idConsulta, dadosAtualizados) => {

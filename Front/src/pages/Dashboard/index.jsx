@@ -17,7 +17,7 @@ import ModalReagendarConsulta from "../../Components/Modals/ModalReagendarConsul
 import ModalEscolherWhatsApp from "../../Components/Modals/ModalEscolherWhatsApp";
 import ModalEnvioLote from "../../Components/Modals/ModalEnvioLote";
 import { FaWhatsapp } from "react-icons/fa";
-import axios from "axios";
+
 
 import "../../styles/Dashboard.css";
 
@@ -61,22 +61,15 @@ const Dashboard = () => {
 
   const puxarRetornosDoBanco = async () => {
   try {
-    const token = localStorage.getItem('@CliniDesk:token');
-    if (!token) return;
-
-    // Garante a formatação correta YYYY-MM-DD
     const dataFormatada = format(dataSelecionada, "yyyy-MM-dd");
 
-    const resposta = await axios.get(`http://localhost:5000/api/pacientes/consultas/retornos?data=${dataFormatada}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const resposta = await api.get(`/pacientes/consultas/retornos?data=${dataFormatada}`);
 
     setRetornos(resposta.data || []);
   } catch (error) {
     console.error("Erro ao carregar os retornos do banco:", error);
   }
 };
-
   useEffect(() => {
     puxarRetornosDoBanco();
   }, [dataSelecionada]); // Executa apenas quando a data do calendário mudar

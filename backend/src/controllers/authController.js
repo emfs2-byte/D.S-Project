@@ -57,10 +57,21 @@ exports.login = async (req, res) => {
             { expiresIn: '8h' }             // Expiração: O token válido por 8 horas
         );
         
-        // Devolve Status 200 (OK) com o token gerado
+        
+        // Define as opções do cookie baseado no ambiente
+        const cookieOpts = {
+            httpOnly: true,   // Invisível para JavaScript client-side (bloqueia roubo via XSS)
+            secure: process.env.NODE_ENV === 'production', // HTTPS obrigatório só em produção
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+            maxAge: 8 * 60 * 60 * 1000,
+        };
+
+        res.cookie('token', token, cookieOpts);
+
         res.status(200).json({
             message: "Login realizado com sucesso",
-            token: token 
+            // NÃO enviamos mais o token no corpo da resposta
+            user: { id: user._id, username: user.username }
         });
 
     } catch (error) {
@@ -91,4 +102,14 @@ exports.getMe = async (req, res) => {
             console.error(error);
             res.status(500).json({ error: "Erro no servidor ao buscar o perfil" });
         }
+};
+
+// ROTA: LOGOUT (INVALIDAR SESSÃO)
+exports.logout = (req, res) => {
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    });
+    res.status(200).json({ message: "Logout realizado com sucesso" });
 };
