@@ -14,6 +14,8 @@ const AgendamentoSchema = new mongoose.Schema({
   responsavel: {
     type: String,
     required: true,
+    trim: true,
+    match: [/^[A-Za-zÀ-ÿ\s'-]+$/,]
   },
   telefone_responsavel: {
     type: String,
@@ -45,11 +47,15 @@ const AgendamentoSchema = new mongoose.Schema({
   },
   medicoRetorno: {
     type: String,
-    default: null
+    default: null,
+    trim: true,
+    match: [/^[A-Za-zÀ-ÿ\s'-]+$/,]
   },
   observacaoRetorno: {
     type: String,
-    default: null
+    default: null,
+    match: [/^[A-Za-zÀ-ÿ\s'-]+$/,],
+    trim: true,
   }
 }, {
   timestamps: true
