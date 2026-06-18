@@ -76,6 +76,11 @@ describe('normalizarNome', () => {
 // ── CALCULATORS ──────────────────────────────────────
 
 describe('diasParaConsulta', () => {
+  it('retorna número positivo para data futura', () => {
+
+    const resultado = diasParaConsulta('2099-12-31');
+    expect(resultado).toBeGreaterThan(0);
+  });
   it('lança TypeError para null', () => {
     expect(() => diasParaConsulta(null)).toThrow(TypeError);
   });
