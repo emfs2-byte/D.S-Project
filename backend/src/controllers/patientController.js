@@ -2,7 +2,11 @@ const Agendamento = require('../models/Agendamento');
 
 exports.agendarConsulta = async (req, res) => {
     try {
-        const { nome_paciente, telefone_paciente, setor, data, horario, responsavel, telefone_responsavel, dataRetorno, observacaoRetorno } = req.body;
+        const { 
+            nome_paciente, telefone_paciente, setor, data, horario, responsavel, 
+            telefone_responsavel, dataRetorno, observacaoRetorno, 
+            horarioRetorno, setorRetorno, medicoRetorno 
+        } = req.body;
 
         const novoAgendamento = new Agendamento({
             nome_paciente,
@@ -13,6 +17,9 @@ exports.agendarConsulta = async (req, res) => {
             responsavel,
             telefone_responsavel,
             dataRetorno,
+            horarioRetorno,
+            setorRetorno,
+            medicoRetorno,
             observacaoRetorno
         });
         
@@ -90,11 +97,14 @@ exports.cancelarConsulta = async (req, res) => {
 exports.salvarRetorno = async (req, res) => {
     try {
         const { id } = req.params;
-        const { dataRetorno, observacaoRetorno } = req.body;
+        const { 
+            dataRetorno, observacaoRetorno, horarioRetorno, 
+            setorRetorno, medicoRetorno 
+        } = req.body;
 
         const consultaAtualizada = await Agendamento.findByIdAndUpdate(
             id,
-            { dataRetorno, observacaoRetorno },
+            { dataRetorno, observacaoRetorno, horarioRetorno, setorRetorno, medicoRetorno },
             { new: true, runValidators: true }
         );
 

@@ -16,13 +16,11 @@ function validarTelefone(tel) {
 }
 
 function validarData(dataStr) {
-    // Trata strings no formato YYYY-MM-DD
     if (typeof dataStr === 'string' && dataStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
         const [ano, mes, dia] = dataStr.split('-').map(Number);
         const data = new Date(ano, mes - 1, dia);
         const hoje = new Date();
         hoje.setHours(0, 0, 0, 0);
-        console.log('📅 Data recebida:', dataStr, '| Data parseada:', data, '| Hoje:', hoje);
         return data >= hoje;
     }
     return false;
@@ -36,10 +34,14 @@ function validarHorario(horario) {
 
 exports.validarAgendamento = (req, res, next) => {
     const erros = [];
-    const { nome_paciente, telefone_paciente, responsavel, telefone_responsavel, setor, data, horario } = req.body;
+    const { 
+        nome_paciente, telefone_paciente, responsavel, telefone_responsavel, setor, data, horario,
+        dataRetorno, horarioRetorno, setorRetorno, medicoRetorno 
+    } = req.body;
 
     console.log('📋 Validando agendamento:', { nome_paciente, setor, data, horario });
 
+    // VALIDAÇÕES DOS CAMPOS OBRIGATÓRIOS
     if (!nome_paciente?.trim())
         erros.push({ campo: 'nome_paciente', mensagem: 'Nome do paciente é obrigatório.' });
 
@@ -59,14 +61,12 @@ exports.validarAgendamento = (req, res, next) => {
     if (!setor?.trim())
         erros.push({ campo: 'setor', mensagem: 'Setor é obrigatório.' });
     else if (!SETORES_VALIDOS.includes(setor)) {
-        console.log('❌ Setor inválido:', setor, 'Válidos:', SETORES_VALIDOS);
         erros.push({ campo: 'setor', mensagem: `Setor inválido. Válidos: ${SETORES_VALIDOS.join(', ')}.` });
     }
 
     if (!data)
         erros.push({ campo: 'data', mensagem: 'Data é obrigatória.' });
     else if (!validarData(data)) {
-        console.log('❌ Data inválida ou no passado:', data);
         erros.push({ campo: 'data', mensagem: 'Data inválida ou no passado.' });
     }
 
@@ -74,6 +74,26 @@ exports.validarAgendamento = (req, res, next) => {
         erros.push({ campo: 'horario', mensagem: 'Horário é obrigatório.' });
     else if (!validarHorario(horario))
         erros.push({ campo: 'horario', mensagem: 'Horário inválido. Use HH:MM entre 08:00 e 18:00.' });
+
+
+    
+    if (dataRetorno && !validarData(dataRetorno)) {
+        erros.push({ campo: 'dataRetorno', mensagem: 'Data do retorno inválida ou no passado.' });
+    }
+
+    if (horarioRetorno?.trim() && !validarHorario(horarioRetorno)) {
+        erros.push({ campo: 'horarioRetorno', mensagem: 'Horário do retorno inválido. Use HH:MM entre 08:00 e 18:00.' });
+    }
+
+    if (setorRetorno?.trim() && !SETORES_VALIDOS.includes(setorRetorno)) {
+        erros.push({ campo: 'setorRetorno', mensagem: 'Setor do retorno inválido.' });
+    }
+
+    // O campo medicoRetorno não necessita de validação complexa por ser String livre, 
+    // mas se for inserido apenas espaços em branco, limpamos o valor
+    if (medicoRetorno && !medicoRetorno.trim()) {
+        req.body.medicoRetorno = null;
+    }
 
     if (erros.length > 0) {
         console.log('❌ Validação falhou:', erros);
