@@ -53,7 +53,7 @@ const Dashboard = () => {
   const [consultaParaCancelar, setConsultaParaCancelar] = useState(null);
   const [consultaSelecionada, setConsultaSelecionada] = useState(null);
   const [consultaWhatsApp, setConsultaWhatsApp] = useState(null);
-  const [abaAtiva, setAbaAtiva] = useState('retornos');
+  const [abaAtiva, setAbaAtiva] = useState('consultas');
   const [retornos, setRetornos] = useState([]);
 
   const puxarRetornosDoBanco = async () => {
@@ -75,10 +75,8 @@ const Dashboard = () => {
 };
 
   useEffect(() => {
-    if (abaAtiva === 'retornos') {
-      puxarRetornosDoBanco();
-    }
-  }, [dataSelecionada, abaAtiva]); // Executa sempre que mudar o dia ou clicar na aba
+    puxarRetornosDoBanco();
+  }, [dataSelecionada]); // Executa apenas quando a data do calendário mudar
 
   const consultasFiltradas = consultas.filter((consulta) => {
     if (!consulta || !consulta.data) return false;

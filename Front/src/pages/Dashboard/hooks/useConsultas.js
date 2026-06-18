@@ -28,17 +28,16 @@ export const useConsultas = () => {
     buscarConsultas();
   }, []);
 
-  // Adiciona uma consulta nova (recarrega do banco para garantir dados atualizados)
-  const adicionarConsulta = async (novaConsulta) => {
+ const adicionarConsulta = async (novaConsulta) => {
     try {
       const token = localStorage.getItem('@CliniDesk:token');
       
-      const resposta = await axios.post('http://localhost:5000/api/pacientes/consultas', novaConsulta, {
+      await axios.post('http://localhost:5000/api/pacientes/consultas', novaConsulta, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      // Atualiza o estado local das consultas do dia corrente
-      setConsultas(prev => [...prev, resposta.data]);
+      await buscarConsultas(); 
+      
       return true; 
     } catch (error) {
       console.error("Erro ao cadastrar agendamento:", error);
@@ -50,10 +49,13 @@ export const useConsultas = () => {
   const cancelarConsulta = async (consultaAlvo) => {
     try {
       const token = localStorage.getItem('@CliniDesk:token');
+      
       await axios.delete(`http://localhost:5000/api/pacientes/consultas/${consultaAlvo._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setConsultas(anterior => anterior.filter(c => c._id !== consultaAlvo._id));
+
+      await buscarConsultas();
+
     } catch (error) {
       console.error('Erro ao cancelar consulta:', error);
       alert('Não foi possível cancelar o agendamento.');
