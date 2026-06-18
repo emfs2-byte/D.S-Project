@@ -21,7 +21,10 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
     data: new Date(),
     horario: '',
     dataRetorno: "",
-    observacaoRetorno: ""
+    observacaoRetorno: "",
+    horarioRetorno: "",
+    setorRetorno: "",
+    medicoRetorno: ""
   });
 
   const handleSubmit = async (e) => {
@@ -127,7 +130,8 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
                 type="time"
                 required
                 className="form-input"
-                onChange={(e) => setFormData({...formData, horario: e.target.value})}
+                value={formData.horario || ""}
+                onChange={(e) => setFormData({...formData, horario: e.target.value})} 
               />
             </div>
           </div>
@@ -137,26 +141,38 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas }) => {
               Configuração de Retorno (Opcional)
             </h4>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+            {/* Grid expandido para 3 colunas */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px', marginBottom: '15px' }}>
               <div className="form-group">
-                <label style={{ fontWeight: '500', display: 'block', marginBottom: '5px', fontSize: '13px' }}>Data do Retorno</label>
+                <label style={{ fontSize: '12px', fontWeight: '500' }}>Data</label>
+                <input type="date" className="form-input" onChange={(e) => setFormData({...formData, dataRetorno: e.target.value})} />
+              </div>
+              <div className="form-group">
+                <label style={{ fontSize: '12px', fontWeight: '500' }}>Horário</label>
                 <input 
-                  type="date" 
+                  type="time" 
                   className="form-input"
-                  value={formData.dataRetorno} 
-                  onChange={(e) => setFormData({ ...formData, dataRetorno: e.target.value })}
+                  value={formData.horarioRetorno || ""} 
+                  onChange={(e) => setFormData({...formData, horarioRetorno: e.target.value})} // 👈 Chave 'horarioRetorno'
                 />
               </div>
-
               <div className="form-group">
-                <label style={{ fontWeight: '500', display: 'block', marginBottom: '5px', fontSize: '13px' }}>Observações</label>
-                <input 
-                  type="text" 
-                  className="form-input"
-                  placeholder="Ex: Trazer exames de sangue"
-                  value={formData.observacaoRetorno} 
-                  onChange={(e) => setFormData({ ...formData, observacaoRetorno: e.target.value })}
-                />
+                <label style={{ fontSize: '12px', fontWeight: '500' }}>Médico</label>
+                <input type="text" className="form-input" placeholder="Nome do médico" onChange={(e) => setFormData({...formData, medicoRetorno: e.target.value})} />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+              <div className="form-group">
+                <label style={{ fontSize: '12px', fontWeight: '500' }}>Setor</label>
+                <select className="form-select" onChange={(e) => setFormData({...formData, setorRetorno: e.target.value})}>
+                  <option value="">Selecione um setor...</option>
+                  {clinicas.map((c, i) => <option key={i} value={c.nome}>{c.nome}</option>)}
+                </select>
+              </div>
+              <div className="form-group">
+                <label style={{ fontSize: '12px', fontWeight: '500' }}>Observações</label>
+                <input type="text" className="form-input" placeholder="Trazer exames..." onChange={(e) => setFormData({...formData, observacaoRetorno: e.target.value})} />
               </div>
             </div>
           </div>
