@@ -45,20 +45,26 @@ export const useConsultas = () => {
     }
   };
 
-  // Cancela (remove) uma consulta pelo _id do MongoDB
   const cancelarConsulta = async (consultaAlvo) => {
     try {
       const token = localStorage.getItem('@CliniDesk:token');
-      
-      await axios.delete(`http://localhost:5000/api/pacientes/consultas/${consultaAlvo._id}`, {
+      const isRetorno = consultaAlvo.tipo === 'Retorno';
+      const url = isRetorno
+        ? `http://localhost:5000/api/pacientes/consultas/retornos/${consultaAlvo._id}`
+        : `http://localhost:5000/api/pacientes/consultas/${consultaAlvo._id}`;
+
+      await axios.delete(url, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      await buscarConsultas();
-
+      if (!isRetorno) {
+        await buscarConsultas();
+      }
+      return true; 
     } catch (error) {
       console.error('Erro ao cancelar consulta:', error);
       alert('Não foi possível cancelar o agendamento.');
+      return false; 
     }
   };
 
@@ -117,16 +123,13 @@ export const useConsultas = () => {
   const toggleLembrete = (idConsulta, nomeUsuario) => {
     setConsultas(anterior => 
       anterior.map(consulta => {
-        // Quando encontrar a consulta ou retorno exato pelo ID 
-        if (consulta._id === idConsulta) {
+        if (consulta && consulta._id === idConsulta) {
           return {
             ...consulta,
-            // Se já tiver remetente, ele zera (desmarca). Se não, ele preenche (marca).
             lembrete_enviado_por: consulta.lembrete_enviado_por ? null : nomeUsuario,
             lembrete_enviado_em: consulta.lembrete_enviado_por ? null : new Date().toLocaleString()
           };
         }
-        // Retorna as outras consultas intactas
         return consulta;
       })
     );

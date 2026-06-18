@@ -33,6 +33,14 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas, isRetorno = false }) 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const dataHoraEscolhida = new Date(`${formData.data}T${formData.horario}:00`);
+    const agora = new Date();
+
+    if (dataHoraEscolhida < agora) {
+      alert("Não é possível agendar em datas ou horários que já passaram!");
+      return; // Para a execução aqui e não deixa salvar
+    }
+
     try {
       // Preparamos o objeto base com todos os dados atuais do formulário
       let dadosProntosParaOBanco = {
@@ -43,22 +51,28 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas, isRetorno = false }) 
       };
 
       if (isRetorno) {
-        //SE FOR RETORNO DIRETO:
         dadosProntosParaOBanco.dataRetorno = format(formData.data, 'yyyy-MM-dd');
         dadosProntosParaOBanco.horarioRetorno = formData.horario;
         dadosProntosParaOBanco.setorRetorno = formData.setor;
-        
-        //Sincroniza o médico e observação com os campos que o backend exige para retornos
         dadosProntosParaOBanco.medicoRetorno = formData.medico;
         dadosProntosParaOBanco.observacaoRetorno = formData.observacao;
         
       } else {
-        //SE FOR CONSULTA NORMAL COM RETORNO OPCIONAL:
-        dadosProntosParaOBanco.dataRetorno = formData.dataRetorno || null;
-        dadosProntosParaOBanco.horarioRetorno = formData.horarioRetorno || null;
-        dadosProntosParaOBanco.setorRetorno = formData.setorRetorno || null;
-        dadosProntosParaOBanco.medicoRetorno = formData.medicoRetorno || null;
-        dadosProntosParaOBanco.observacaoRetorno = formData.observacaoRetorno || null;
+        // Se a data ou o horário não foram preenchidos, apagamos essas variáveis para não dar erro 422
+        if (!formData.dataRetorno || !formData.horarioRetorno) {
+            delete dadosProntosParaOBanco.dataRetorno;
+            delete dadosProntosParaOBanco.horarioRetorno;
+            delete dadosProntosParaOBanco.setorRetorno;
+            delete dadosProntosParaOBanco.medicoRetorno;
+            delete dadosProntosParaOBanco.observacaoRetorno;
+        } else {
+            // Se preencheu direitinho, enviamos normalmente
+            dadosProntosParaOBanco.dataRetorno = formData.dataRetorno;
+            dadosProntosParaOBanco.horarioRetorno = formData.horarioRetorno;
+            dadosProntosParaOBanco.setorRetorno = formData.setorRetorno;
+            dadosProntosParaOBanco.medicoRetorno = formData.medicoRetorno;
+            dadosProntosParaOBanco.observacaoRetorno = formData.observacaoRetorno;
+        }
       }
       
       console.log("DADOS CORRIGIDOS INDO PRO BANCO:", dadosProntosParaOBanco);
@@ -68,7 +82,7 @@ const ModalNovoAgendamento = ({ onClose, onSave, clinicas, isRetorno = false }) 
       
       const dadoFinal = resultado.agendamento || resultado;
       onSave({ ...dadoFinal, tipo: isRetorno ? 'Retorno' : 'Consulta', isRetorno: isRetorno });
-      onClose(); // Fecha o modal após salvar com sucesso
+      onClose(); 
 
     } catch (error) {
       console.error("❌ Erro ao salvar:", error);

@@ -32,6 +32,7 @@ const Dashboard = () => {
     cancelarConsulta,
     salvarEdicao,
     salvarReagendamento,
+    buscarConsultas,
     toggleLembrete,
   } = useConsultas();
 
@@ -107,13 +108,32 @@ const Dashboard = () => {
     setSelecionados(selecionados.length === consultasFiltradas.length && consultasFiltradas.length > 0 ? [] : [...consultasFiltradas]);
   };
 
-  const confirmarCancelamento = async (consulta) => {
+  const confirmarCancelamento = async () => {
     try {
-      await cancelarConsulta(consultaParaCancelar);
+      const sucesso = await cancelarConsulta(consultaParaCancelar);
+      if (sucesso && consultaParaCancelar.tipo === 'Retorno') {
+        puxarRetornosDoBanco(); 
+      }
+      
       setConsultaParaCancelar(null);
     } catch (error) {
       console.error("Erro ao cancelar consulta:", error);
-      alert("Erro ao cancelar consulta. Tente novamente.");
+    }
+  };
+  const handleToggleLembrete = (idConsulta, nomeUsuario) => {
+    if (abaAtiva === 'consultas') {
+      toggleLembrete(idConsulta, nomeUsuario);
+    } else {
+      setRetornos(anterior => anterior.map(retorno => {
+        if (retorno && retorno._id === idConsulta) {
+          return {
+            ...retorno,
+            lembrete_enviado_por: retorno.lembrete_enviado_por ? null : nomeUsuario,
+            lembrete_enviado_em: retorno.lembrete_enviado_por ? null : new Date().toLocaleString()
+          };
+        }
+        return retorno;
+      }));
     }
   };
 
@@ -205,7 +225,7 @@ const Dashboard = () => {
       <ConsultasTable
         consultas={abaAtiva === 'consultas' ? consultasFiltradas : retornos} 
         abaAtiva={abaAtiva} 
-        onToggleLembrete={toggleLembrete}
+        onToggleLembrete={handleToggleLembrete}
         onEditar={(c) => { setConsultaSelecionada(c); setIsModalEditarOpen(true); }}
         onReagendar={(c) => { setConsultaSelecionada(c); setIsModalReagendarOpen(true); }}
         onCancelar={setConsultaParaCancelar}
@@ -217,15 +237,24 @@ const Dashboard = () => {
 
       {/* Modais */}
       {isModalLoteOpen && <ModalEnvioLote selecionados={selecionados} onClose={() => setIsModalLoteOpen(false)} />}
-      {isModalNovoOpen && <ModalNovoAgendamento onClose={() => setIsModalNovoOpen(false)} clinicas={clinicas} onSave={(nova) => { adicionarConsulta(nova); setIsModalNovoOpen(false); }} />}
-        {isModalNovoRetornoOpen && (
+      {isModalNovoOpen && (
+        <ModalNovoAgendamento 
+          onClose={() => setIsModalNovoOpen(false)} 
+          clinicas={clinicas} 
+          onSave={async () => { 
+            await buscarConsultas(); 
+            setIsModalNovoOpen(false); 
+          }} 
+        />
+      )}
+      {isModalNovoRetornoOpen && (
         <ModalNovoAgendamento 
           onClose={() => setIsModalNovoRetornoOpen(false)} 
           clinicas={clinicas} 
           isRetorno={true} 
-          onSave={(nova) => { 
-            adicionarConsulta({ ...nova, tipo: 'Retorno' }); 
-            puxarRetornosDoBanco(); 
+          onSave={async () => { 
+            await puxarRetornosDoBanco();
+            await buscarConsultas(); 
             setIsModalNovoRetornoOpen(false); 
           }} 
         />
