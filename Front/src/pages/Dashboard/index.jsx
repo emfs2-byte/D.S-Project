@@ -43,6 +43,7 @@ const Dashboard = () => {
 
   // Estados de modais
   const [isModalNovoOpen, setIsModalNovoOpen] = useState(false);
+  const [isModalNovoRetornoOpen, setIsModalNovoRetornoOpen] = useState(false);
   const [isModalClinicasOpen, setIsModalClinicasOpen] = useState(false);
   const [isModalPerfilOpen, setIsModalPerfilOpen] = useState(false);
   const [isModalEditarOpen, setIsModalEditarOpen] = useState(false);
@@ -55,6 +56,7 @@ const Dashboard = () => {
   const [consultaWhatsApp, setConsultaWhatsApp] = useState(null);
   const [abaAtiva, setAbaAtiva] = useState('consultas');
   const [retornos, setRetornos] = useState([]);
+  
 
   const puxarRetornosDoBanco = async () => {
   try {
@@ -146,7 +148,7 @@ const Dashboard = () => {
         </div>
       )}
 
-      <div className="tabs-container" style={{ display: 'flex', gap: '15px', margin: '15px 0', borderBottom: '1px solid #e2e8f0' }}>
+      <div className="tabs-container" style={{ display: 'flex', alignItems: 'center', gap: '15px', margin: '15px 0', borderBottom: '1px solid #e2e8f0' }}>
         <button 
           className={`tab-btn ${abaAtiva === 'consultas' ? 'active' : ''}`}
           onClick={() => setAbaAtiva('consultas')}
@@ -179,8 +181,27 @@ const Dashboard = () => {
         >
           Retornos Agendados ({retornos.length})
         </button>
+        {abaAtiva === 'retornos' && (
+          <button
+            onClick={() => setIsModalNovoRetornoOpen(true)}
+            style={{
+              marginLeft: 'auto',
+              padding: '8px 16px',
+              fontSize: '14px',
+              fontWeight: '600',
+              color: '#fff',
+              backgroundColor: '#10b981', // Um verde bonito para diferenciar do agendamento comum
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              marginBottom: '5px',
+              transition: 'background-color 0.2s'
+            }}
+          >
+            + Novo Retorno
+          </button>
+        )}
       </div>
-
       <ConsultasTable
         consultas={abaAtiva === 'consultas' ? consultasFiltradas : retornos} 
         abaAtiva={abaAtiva} 
@@ -196,8 +217,19 @@ const Dashboard = () => {
 
       {/* Modais */}
       {isModalLoteOpen && <ModalEnvioLote selecionados={selecionados} onClose={() => setIsModalLoteOpen(false)} />}
-      
       {isModalNovoOpen && <ModalNovoAgendamento onClose={() => setIsModalNovoOpen(false)} clinicas={clinicas} onSave={(nova) => { adicionarConsulta(nova); setIsModalNovoOpen(false); }} />}
+        {isModalNovoRetornoOpen && (
+        <ModalNovoAgendamento 
+          onClose={() => setIsModalNovoRetornoOpen(false)} 
+          clinicas={clinicas} 
+          isRetorno={true} 
+          onSave={(nova) => { 
+            adicionarConsulta({ ...nova, tipo: 'Retorno' }); 
+            puxarRetornosDoBanco(); 
+            setIsModalNovoRetornoOpen(false); 
+          }} 
+        />
+      )}
       {isModalClinicasOpen && <ModalGerenciarClinicas onClose={() => setIsModalClinicasOpen(false)} clinicas={clinicas} setClinicas={setClinicas} />}
       <ModalPerfil isOpen={isModalPerfilOpen} onClose={() => setIsModalPerfilOpen(false)} onLogout={() => navigate("/")} />
       {consultaParaCancelar && <ModalConfirmarCancelamento consulta={consultaParaCancelar} onClose={() => setConsultaParaCancelar(null)} onConfirm={confirmarCancelamento} />}

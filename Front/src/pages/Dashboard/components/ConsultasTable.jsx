@@ -157,7 +157,7 @@ const ConsultasTable = ({
               {/* Botão de lembrete */}
               <div className="status-cell">
                 <button
-                  onClick={() => onToggleLembrete(item, 'Sistema')}
+                  onClick={() => onToggleLembrete(item._id, 'Sistema')}
                   className={`status-circle ${item.lembrete_enviado_por ? 'status-circle-enviado' : 'status-circle-pendente'}`}
                   title={item.lembrete_enviado_por ? 'Desmarcar lembrete' : 'Marcar como enviado'}
                 >

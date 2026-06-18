@@ -114,23 +114,23 @@ export const useConsultas = () => {
   };
 
   // Liga/desliga o lembrete de uma consulta
-  const toggleLembrete = (index, nomeUsuario) => {
-    setConsultas(anterior => {
-      const copia = [...anterior];
-      const consulta = copia[index];
-
-      if (consulta.lembrete_enviado_por) {
-        consulta.lembrete_enviado_por = null;
-        consulta.lembrete_enviado_em = null;
-      } else {
-        consulta.lembrete_enviado_por = nomeUsuario;
-        consulta.lembrete_enviado_em = new Date().toLocaleString();
-      }
-
-      return copia;
-    });
+  const toggleLembrete = (idConsulta, nomeUsuario) => {
+    setConsultas(anterior => 
+      anterior.map(consulta => {
+        // Quando encontrar a consulta ou retorno exato pelo ID 
+        if (consulta._id === idConsulta) {
+          return {
+            ...consulta,
+            // Se já tiver remetente, ele zera (desmarca). Se não, ele preenche (marca).
+            lembrete_enviado_por: consulta.lembrete_enviado_por ? null : nomeUsuario,
+            lembrete_enviado_em: consulta.lembrete_enviado_por ? null : new Date().toLocaleString()
+          };
+        }
+        // Retorna as outras consultas intactas
+        return consulta;
+      })
+    );
   };
-
   return {
     consultas,
     buscarConsultas,
