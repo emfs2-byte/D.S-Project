@@ -35,6 +35,18 @@ const AgendamentoSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
+  horarioRetorno: {
+    type: String,
+    default: null
+  },
+  setorRetorno: {
+    type: String,
+    default: null
+  },
+  medicoRetorno: {
+    type: String,
+    default: null
+  },
   observacaoRetorno: {
     type: String,
     default: null
