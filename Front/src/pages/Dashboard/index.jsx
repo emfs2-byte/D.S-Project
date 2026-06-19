@@ -17,6 +17,7 @@ import ModalReagendarConsulta from "../../Components/Modals/ModalReagendarConsul
 import ModalEscolherWhatsApp from "../../Components/Modals/ModalEscolherWhatsApp";
 import ModalEnvioLote from "../../Components/Modals/ModalEnvioLote";
 import { FaWhatsapp } from "react-icons/fa";
+import api from '../../lib/api';
 
 
 import "../../styles/Dashboard.css";
@@ -98,7 +99,7 @@ const Dashboard = () => {
 
   const confirmarCancelamento = async (consulta) => {
     try {
-      await cancelarConsulta(consulta.id);
+      await cancelarConsulta(consulta);
       setConsultaParaCancelar(null);
     } catch (error) {
       console.error("Erro ao cancelar consulta:", error);
