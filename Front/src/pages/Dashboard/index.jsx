@@ -104,15 +104,11 @@ const Dashboard = () => {
 
   const confirmarCancelamento = async () => {
     try {
-<<<<<<< HEAD
       const sucesso = await cancelarConsulta(consultaParaCancelar);
       if (sucesso && consultaParaCancelar.tipo === 'Retorno') {
         puxarRetornosDoBanco(); 
       }
       
-=======
-      await cancelarConsulta(consulta);
->>>>>>> origin/feature/auth-cookies
       setConsultaParaCancelar(null);
     } catch (error) {
       console.error("Erro ao cancelar consulta:", error);
