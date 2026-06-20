@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../../lib/api';
+
 export const useConsultas = () => {
   const [consultas, setConsultas] = useState([]);
 
@@ -19,7 +20,7 @@ export const useConsultas = () => {
   }, []);
 
   // Adiciona uma consulta nova (recarrega do banco para garantir dados atualizados)
-   const adicionarConsulta = async (novaConsulta) => {
+  const adicionarConsulta = async (novaConsulta) => {
     try {
       const resposta = await api.post('/pacientes/consultas', novaConsulta);
       setConsultas(prev => [...prev, resposta.data]);
@@ -31,79 +32,27 @@ export const useConsultas = () => {
   };
 
   // Cancela (remove) uma consulta pelo _id do MongoDB
-const cancelarConsulta = async (consultaAlvo) => {
-  try {
-    // Mantém a regra de negócio da branch main
-    const isRetorno = consultaAlvo.tipo === 'Retorno';
-    const url = isRetorno 
-      ? `/pacientes/consultas/retornos/${consultaAlvo._id}` 
-      : `/pacientes/consultas/${consultaAlvo._id}`;
-
-    // Usa a instância 'api' da branch auth-cookies
-    await api.delete(url);
-    
-    // Atualiza o estado local para remover o item da tela
-    setConsultas(anterior => anterior.filter(c => c._id !== consultaAlvo._id));
-
-  } catch (error) {
-    console.error("Erro ao cancelar consulta:", error);
-    alert('Não foi possível cancelar o agendamento.');
-    return false;
-  }
-};
-
-  // Salva edição de uma consulta existente direto no banco de dados
-  const salvarEdicao = async (idConsulta, dadosAtualizados) => {
+  const cancelarConsulta = async (consultaAlvo) => {
     try {
-      const token = localStorage.getItem('@CliniDesk:token');
+      // Mantém a regra de negócio da branch main
+      const isRetorno = consultaAlvo.tipo === 'Retorno';
+      const url = isRetorno 
+        ? `/pacientes/consultas/retornos/${consultaAlvo._id}` 
+        : `/pacientes/consultas/${consultaAlvo._id}`;
+
+      // Usa a instância 'api' da branch auth-cookies
+      await api.delete(url);
       
-      // Faz a requisição PUT enviando o ID na URL e as alterações no body
-      const resposta = await axios.put(`http://localhost:5000/api/pacientes/consultas/${idConsulta}`, dadosAtualizados, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // Atualiza o estado local para remover o item da tela
+      setConsultas(anterior => anterior.filter(c => c._id !== consultaAlvo._id));
 
-      // O backend retorna o agendamento atualizado dentro de resposta.data.agendamento
-      const consultaAtualizadaDoBanco = resposta.data.agendamento;
-
-      // Atualiza o estado do React substituindo apenas a consulta modificada
-      setConsultas(anterior =>
-        anterior.map(c => c._id === idConsulta ? consultaAtualizadaDoBanco : c)
-      );
-
-      return true;
     } catch (error) {
-      console.error('Erro ao salvar edição da consulta:', error);
-      alert('Não foi possível atualizar as alterações no servidor.');
+      console.error("Erro ao cancelar consulta:", error);
+      alert('Não foi possível cancelar o agendamento.');
       return false;
     }
   };
 
-<<<<<<< HEAD
-  // Reagenda uma consulta existente direto no banco de dados
-  const salvarReagendamento = async (idConsulta, dadosReagendados) => {
-    try {
-      const token = localStorage.getItem('@CliniDesk:token');
-      
-      // Envia as novas informações de data/horário para o backend
-      const resposta = await axios.put(`http://localhost:5000/api/pacientes/consultas/${idConsulta}`, dadosReagendados, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      const consultaAtualizadaDoBanco = resposta.data.agendamento;
-
-      // Atualiza o estado local do React com a nova data/horário
-      setConsultas(anterior =>
-        anterior.map(c => c._id === idConsulta ? consultaAtualizadaDoBanco : c)
-      );
-
-      return true;
-    } catch (error) {
-      console.error('Erro ao salvar reagendamento da consulta:', error);
-      alert('Não foi possível atualizar o reagendamento no servidor.');
-      return false;
-    }
-  };
-=======
   // Salva edição de uma consulta existente
   const salvarEdicao = async (consultaOriginal, consultaEditada) => {
     try {
@@ -117,7 +66,8 @@ const cancelarConsulta = async (consultaAlvo) => {
         alert('Não foi possível salvar as alterações.');
         return false;
     }
-};
+  };
+
   // Reagenda uma consulta existente
   const salvarReagendamento = async (consultaOriginal, consultaReagendada) => {
     try {
@@ -131,8 +81,7 @@ const cancelarConsulta = async (consultaAlvo) => {
         alert('Não foi possível reagendar.');
         return false;
     }
-};
->>>>>>> origin/feature/auth-cookies
+  };
 
   // Liga/desliga o lembrete de uma consulta
   const toggleLembrete = (idConsulta, nomeUsuario) => {
@@ -149,6 +98,7 @@ const cancelarConsulta = async (consultaAlvo) => {
       })
     );
   };
+
   return {
     consultas,
     buscarConsultas,
