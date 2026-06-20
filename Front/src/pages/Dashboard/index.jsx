@@ -17,6 +17,7 @@ import ModalReagendarConsulta from "../../Components/Modals/ModalReagendarConsul
 import ModalEscolherWhatsApp from "../../Components/Modals/ModalEscolherWhatsApp";
 import ModalEnvioLote from "../../Components/Modals/ModalEnvioLote";
 import { FaWhatsapp } from "react-icons/fa";
+import api from '../../lib/api';
 
 
 import "../../styles/Dashboard.css";
@@ -103,11 +104,15 @@ const Dashboard = () => {
 
   const confirmarCancelamento = async () => {
     try {
+<<<<<<< HEAD
       const sucesso = await cancelarConsulta(consultaParaCancelar);
       if (sucesso && consultaParaCancelar.tipo === 'Retorno') {
         puxarRetornosDoBanco(); 
       }
       
+=======
+      await cancelarConsulta(consulta);
+>>>>>>> origin/feature/auth-cookies
       setConsultaParaCancelar(null);
     } catch (error) {
       console.error("Erro ao cancelar consulta:", error);
@@ -255,8 +260,8 @@ const Dashboard = () => {
       {isModalClinicasOpen && <ModalGerenciarClinicas onClose={() => setIsModalClinicasOpen(false)} clinicas={clinicas} setClinicas={setClinicas} />}
       <ModalPerfil isOpen={isModalPerfilOpen} onClose={() => setIsModalPerfilOpen(false)} onLogout={() => navigate("/")} />
       {consultaParaCancelar && <ModalConfirmarCancelamento consulta={consultaParaCancelar} onClose={() => setConsultaParaCancelar(null)} onConfirm={confirmarCancelamento} />}
-      {isModalEditarOpen && consultaSelecionada && <ModalEditarConsulta onClose={() => { setIsModalEditarOpen(false); setConsultaSelecionada(null); }} onSave={(id, editada) => { salvarEdicao(id, editada); setIsModalEditarOpen(false); setConsultaSelecionada(null); }} consulta={consultaSelecionada} clinicas={clinicas} />}
-      {isModalReagendarOpen && consultaSelecionada && <ModalReagendarConsulta onClose={() => { setIsModalReagendarOpen(false); setConsultaSelecionada(null); }} onSave={(id, reagendada) => { salvarReagendamento(id, reagendada); setIsModalReagendarOpen(false); setConsultaSelecionada(null); }} consulta={consultaSelecionada} />}
+      {isModalEditarOpen && consultaSelecionada && <ModalEditarConsulta onClose={() => { setIsModalEditarOpen(false); setConsultaSelecionada(null); }} onSave={async(editada) => { await salvarEdicao(consultaSelecionada, editada); setIsModalEditarOpen(false); setConsultaSelecionada(null); }} consulta={consultaSelecionada} clinicas={clinicas} />}
+      {isModalReagendarOpen && consultaSelecionada && <ModalReagendarConsulta onClose={() => { setIsModalReagendarOpen(false); setConsultaSelecionada(null); }} onSave={async(reagendada) => {await  salvarReagendamento(consultaSelecionada, reagendada); setIsModalReagendarOpen(false); setConsultaSelecionada(null); }} consulta={consultaSelecionada} />}
       {isModalWhatsOpen && consultaWhatsApp && <ModalEscolherWhatsApp consulta={consultaWhatsApp} onClose={() => { setIsModalWhatsOpen(false); setConsultaWhatsApp(null); }} onConfirm={() => { setIsModalWhatsOpen(false); setConsultaWhatsApp(null); }} />}
     </div>
   );

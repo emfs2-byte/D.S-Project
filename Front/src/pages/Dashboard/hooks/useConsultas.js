@@ -78,6 +78,7 @@ const cancelarConsulta = async (consultaAlvo) => {
     }
   };
 
+<<<<<<< HEAD
   // Reagenda uma consulta existente direto no banco de dados
   const salvarReagendamento = async (idConsulta, dadosReagendados) => {
     try {
@@ -102,6 +103,36 @@ const cancelarConsulta = async (consultaAlvo) => {
       return false;
     }
   };
+=======
+  // Salva edição de uma consulta existente
+  const salvarEdicao = async (consultaOriginal, consultaEditada) => {
+    try {
+        const resposta = await api.put(`/pacientes/consultas/${consultaOriginal._id}`, consultaEditada);
+        setConsultas(anterior =>
+            anterior.map(c => c._id === consultaOriginal._id ? resposta.data.agendamento : c)
+        );
+        return true;
+    } catch (error) {
+        console.error('Erro ao editar consulta:', error);
+        alert('Não foi possível salvar as alterações.');
+        return false;
+    }
+};
+  // Reagenda uma consulta existente
+  const salvarReagendamento = async (consultaOriginal, consultaReagendada) => {
+    try {
+        const resposta = await api.put(`/pacientes/consultas/${consultaOriginal._id}`, consultaReagendada);
+        setConsultas(anterior =>
+            anterior.map(c => c._id === consultaOriginal._id ? resposta.data.agendamento : c)
+        );
+        return true;
+    } catch (error) {
+        console.error('Erro ao reagendar consulta:', error);
+        alert('Não foi possível reagendar.');
+        return false;
+    }
+};
+>>>>>>> origin/feature/auth-cookies
 
   // Liga/desliga o lembrete de uma consulta
   const toggleLembrete = (idConsulta, nomeUsuario) => {
