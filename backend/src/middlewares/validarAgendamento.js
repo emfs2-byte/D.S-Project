@@ -39,8 +39,6 @@ exports.validarAgendamento = (req, res, next) => {
         dataRetorno, horarioRetorno, setorRetorno, medicoRetorno 
     } = req.body;
 
-    console.log('📋 Validando agendamento:', { nome_paciente, setor, data, horario });
-
     // VALIDAÇÕES DOS CAMPOS OBRIGATÓRIOS
     if (!nome_paciente?.trim())
         erros.push({ campo: 'nome_paciente', mensagem: 'Nome do paciente é obrigatório.' });
@@ -74,8 +72,6 @@ exports.validarAgendamento = (req, res, next) => {
         erros.push({ campo: 'horario', mensagem: 'Horário é obrigatório.' });
     else if (!validarHorario(horario))
         erros.push({ campo: 'horario', mensagem: 'Horário inválido. Use HH:MM entre 08:00 e 18:00.' });
-
-
     
     if (dataRetorno && !validarData(dataRetorno)) {
         erros.push({ campo: 'dataRetorno', mensagem: 'Data do retorno inválida ou no passado.' });
@@ -96,10 +92,8 @@ exports.validarAgendamento = (req, res, next) => {
     }
 
     if (erros.length > 0) {
-        console.log('❌ Validação falhou:', erros);
         return res.status(422).json({ erro: 'Dados inválidos.', campos: erros });
     }
 
-    console.log('✅ Validação passou!');
     next();
 };

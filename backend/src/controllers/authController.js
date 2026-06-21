@@ -41,6 +41,11 @@ exports.login = async (req, res) => {
     // Extrai username e password do corpo da requisição
     const { username, password } = req.body; 
 
+    // Garante que os campos são strings (previne NoSQL injection via objeto)
+    if (typeof username !== 'string' || typeof password !== 'string') {
+        return res.status(400).json({ error: "Credenciais inválidas" });
+    }
+
     try {
         // Busca o usuário no banco de dados pelo username
         const user = await User.findOne({ username });

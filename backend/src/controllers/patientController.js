@@ -59,7 +59,7 @@ exports.editarConsulta = async (req, res) => {
         const { id } = req.params;
         const atualizacoes = req.body;
 
-        const consultaAtualizada = await Agendamento.findByIdAndUpdate(id, atualizacoes, { new: true });
+        const consultaAtualizada = await Agendamento.findByIdAndUpdate(id, atualizacoes, { new: true, runValidators: true });
 
         if (!consultaAtualizada) {
             return res.status(404).json({ erro: "Consulta não encontrada." });
