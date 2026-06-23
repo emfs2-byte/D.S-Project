@@ -330,14 +330,14 @@ Uso **educacional** — desenvolvido no contexto do NPI. Uso não comercial. Atr
 
 ## 👥 Contribuidores
 
-Albert Santos - Desenvolvedor Full-Stack
-Samuel Renan - Desenvolvedor Back-End e Administrador do banco de Dados
-Erlon Matheus - Desenvolvedor Front-End e P.O
-Vicente Morais - Desenvolvedor Backend e API
-Hugo José - Desenvolvedor Frontend e UI/UX Designer
-Luiz Miguel- Desenvolvedor Full-Stack / UI Engineer
-Juan William - Desenvolvedor Frontend
-Cleyton Cardoso - Desenvolvedor Backend
+- Albert Santos - Desenvolvedor Full-Stack
+- Samuel Renan - Desenvolvedor Back-End e Administrador do banco de Dados
+- Erlon Matheus - Desenvolvedor Front-End e P.O
+- Vicente Morais - Desenvolvedor Backend e API
+- Hugo José - Desenvolvedor Frontend e UI/UX Designer
+- Luiz Miguel - Desenvolvedor Full-Stack / UI Engineer
+- Juan William - Desenvolvedor Frontend
+- Cleyton Cardoso - Desenvolvedor Backend
 
 ---
 
