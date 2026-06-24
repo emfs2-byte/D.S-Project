@@ -11,6 +11,20 @@ const ModalReagendarConsulta = ({ onClose, onSave, consulta }) => {
   const [aguardandoWhatsApp, setAguardandoWhatsApp] = useState(false);
 
   const handleWhatsAppClick = () => {
+    // 🔥 LOGS PARA DEBUG 🔥
+    console.log('🔍 ===== WHATSAPP CLICK =====');
+    console.log('📝 consulta._id:', consulta._id);
+    console.log('📝 Tipo do ID:', typeof consulta._id);
+    console.log('📝 formData:', formData);
+    console.log('📝 consulta completa:', consulta);
+    
+    // Verifica se o ID existe
+    if (!consulta._id) {
+      console.error('❌ ID da consulta é undefined!');
+      alert('Erro: ID da consulta não encontrado.');
+      return;
+    }
+
     const numeroWhatsApp = consulta.telefone_paciente || consulta.telefone_responsavel;
     
     if (!numeroWhatsApp || numeroWhatsApp.trim() === '') {
@@ -25,6 +39,14 @@ const ModalReagendarConsulta = ({ onClose, onSave, consulta }) => {
     const link = `https://wa.me/${numeroCompleto}?text=${encodeURIComponent(mensagem)}`;
     
     window.open(link, '_blank');
+    
+    console.log('📤 Chamando onSave com:', {
+      id: consulta._id,
+      dados: {
+        data: formData.data,
+        horario: formData.horario
+      }
+    });
     
     onSave(consulta._id, {
       data: formData.data,

@@ -19,7 +19,7 @@ export const useConsultas = () => {
     buscarConsultas();
   }, []);
 
-  // Adiciona uma consulta nova (recarrega do banco para garantir dados atualizados)
+  // Adiciona uma consulta nova
   const adicionarConsulta = async (novaConsulta) => {
     try {
       const resposta = await api.post('/pacientes/consultas', novaConsulta);
@@ -31,21 +31,16 @@ export const useConsultas = () => {
     }
   };
 
-  // Cancela (remove) uma consulta pelo _id do MongoDB
+  // Cancela uma consulta
   const cancelarConsulta = async (consultaAlvo) => {
     try {
-      // Mantém a regra de negócio da branch main
       const isRetorno = consultaAlvo.tipo === 'Retorno';
       const url = isRetorno 
         ? `/pacientes/consultas/retornos/${consultaAlvo._id}` 
         : `/pacientes/consultas/${consultaAlvo._id}`;
 
-      // Usa a instância 'api' da branch auth-cookies
       await api.delete(url);
-      
-      // Atualiza o estado local para remover o item da tela
       setConsultas(anterior => anterior.filter(c => c._id !== consultaAlvo._id));
-
     } catch (error) {
       console.error("Erro ao cancelar consulta:", error);
       alert('Não foi possível cancelar o agendamento.');
@@ -53,33 +48,62 @@ export const useConsultas = () => {
     }
   };
 
-  // Salva edição de uma consulta existente
+  // 🔥 SALVAR EDIÇÃO - CORRIGIDO 🔥
   const salvarEdicao = async (consultaOriginal, consultaEditada) => {
     try {
-        const resposta = await api.put(`/pacientes/consultas/${consultaOriginal._id}`, consultaEditada);
-        setConsultas(anterior =>
-            anterior.map(c => c._id === consultaOriginal._id ? resposta.data.agendamento : c)
-        );
-        return true;
-    } catch (error) {
-        console.error('Erro ao editar consulta:', error);
-        alert('Não foi possível salvar as alterações.');
+      console.log('📝 Editando consulta:', consultaOriginal._id);
+      console.log('📝 Dados editados:', consultaEditada);
+      
+      // Verifica se o ID é válido
+      if (!consultaOriginal || !consultaOriginal._id) {
+        console.error('❌ ID da consulta é inválido');
+        alert('Erro: ID da consulta não encontrado.');
         return false;
+      }
+      
+      // Envia os dados editados para o backend
+      const resposta = await api.put(`/pacientes/consultas/${consultaOriginal._id}`, consultaEditada);
+      
+      console.log('✅ Resposta do backend:', resposta.data);
+      
+      // Recarrega a lista completa do banco para garantir dados atualizados
+      await buscarConsultas();
+      
+      return true;
+    } catch (error) {
+      console.error('❌ Erro ao editar consulta:');
+      console.error('Status:', error.response?.status);
+      console.error('Dados do erro:', error.response?.data);
+      alert(error.response?.data?.erro || 'Não foi possível salvar as alterações.');
+      return false;
     }
   };
 
-  // Reagenda uma consulta existente
-  const salvarReagendamento = async (consultaOriginal, consultaReagendada) => {
+  // 🔥 REAGENDAR CONSULTA - CORRIGIDO 🔥
+  const salvarReagendamento = async (id, dadosReagendados) => {
     try {
-        const resposta = await api.put(`/pacientes/consultas/${consultaOriginal._id}`, consultaReagendada);
-        setConsultas(anterior =>
-            anterior.map(c => c._id === consultaOriginal._id ? resposta.data.agendamento : c)
-        );
-        return true;
-    } catch (error) {
-        console.error('Erro ao reagendar consulta:', error);
-        alert('Não foi possível reagendar.');
+      console.log('📝 Reagendando:', id, dadosReagendados);
+      
+      if (!id || id === 'undefined') {
+        console.error('❌ ID inválido:', id);
+        alert('Erro: ID da consulta não encontrado.');
         return false;
+      }
+      
+      const resposta = await api.put(`/pacientes/consultas/${id}`, {
+        data: dadosReagendados.data,
+        horario: dadosReagendados.horario
+      });
+      
+      console.log('✅ Resposta do backend:', resposta.data);
+      await buscarConsultas();
+      return true;
+    } catch (error) {
+      console.error('❌ Erro ao reagendar consulta:');
+      console.error('Status:', error.response?.status);
+      console.error('Dados do erro:', error.response?.data);
+      alert(error.response?.data?.erro || 'Não foi possível reagendar.');
+      return false;
     }
   };
 

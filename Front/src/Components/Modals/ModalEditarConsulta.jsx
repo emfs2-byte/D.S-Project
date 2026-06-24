@@ -14,11 +14,16 @@ const ModalEditarConsulta = ({ onClose, onSave, consulta, clinicas }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(consulta._id, {
-      ...formData,
-      data: consulta.data,
-      horario: consulta.horario,
-      lembrete_enviado_por: consulta.lembrete_enviado_por
+    
+    console.log('📤 Enviando edição:', formData);
+    
+    // Envia os dados editados para o Dashboard
+    onSave({
+      nome_paciente: formData.nome_paciente,
+      responsavel: formData.responsavel,
+      telefone_paciente: formData.telefone_paciente,
+      telefone_responsavel: formData.telefone_responsavel,
+      setor: formData.setor
     });
   };
 

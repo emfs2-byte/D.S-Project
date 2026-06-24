@@ -19,7 +19,6 @@ import ModalEnvioLote from "../../Components/Modals/ModalEnvioLote";
 import { FaWhatsapp } from "react-icons/fa";
 import api from '../../lib/api';
 
-
 import "../../styles/Dashboard.css";
 
 registerLocale("pt-BR", ptBR);
@@ -42,6 +41,7 @@ const Dashboard = () => {
   const [dataSelecionada, setDataSelecionada] = useState(new Date());
   const [setorSelecionado, setSetorSelecionado] = useState("Todos os setores");
   const [selecionados, setSelecionados] = useState([]);
+  const [buscaTexto, setBuscaTexto] = useState('');
 
   // Estados de modais
   const [isModalNovoOpen, setIsModalNovoOpen] = useState(false);
@@ -52,28 +52,25 @@ const Dashboard = () => {
   const [isModalReagendarOpen, setIsModalReagendarOpen] = useState(false);
   const [isModalWhatsOpen, setIsModalWhatsOpen] = useState(false);
   const [isModalLoteOpen, setIsModalLoteOpen] = useState(false);
-  const [buscaTexto, setBuscaTexto] = useState('');
   const [consultaParaCancelar, setConsultaParaCancelar] = useState(null);
   const [consultaSelecionada, setConsultaSelecionada] = useState(null);
   const [consultaWhatsApp, setConsultaWhatsApp] = useState(null);
   const [abaAtiva, setAbaAtiva] = useState('consultas');
   const [retornos, setRetornos] = useState([]);
-  
 
   const puxarRetornosDoBanco = async () => {
-  try {
-    const dataFormatada = format(dataSelecionada, "yyyy-MM-dd");
+    try {
+      const dataFormatada = format(dataSelecionada, "yyyy-MM-dd");
+      const resposta = await api.get(`/pacientes/consultas/retornos?data=${dataFormatada}`);
+      setRetornos(resposta.data || []);
+    } catch (error) {
+      console.error("Erro ao carregar os retornos do banco:", error);
+    }
+  };
 
-    const resposta = await api.get(`/pacientes/consultas/retornos?data=${dataFormatada}`);
-
-    setRetornos(resposta.data || []);
-  } catch (error) {
-    console.error("Erro ao carregar os retornos do banco:", error);
-  }
-};
   useEffect(() => {
     puxarRetornosDoBanco();
-  }, [dataSelecionada]); // Executa apenas quando a data do calendário mudar
+  }, [dataSelecionada]);
 
   const consultasFiltradas = consultas.filter((consulta) => {
     if (!consulta || !consulta.data) return false;
@@ -86,6 +83,18 @@ const Dashboard = () => {
       consulta.telefone_paciente?.includes(buscaTexto) ||
       consulta.telefone_responsavel?.includes(buscaTexto);
     return matchesData && matchesSetor && matchesBusca;
+  });
+
+  const retornosFiltrados = retornos.filter((retorno) => {
+    if (!retorno) return false;
+    const busca = buscaTexto.trim().toLowerCase();
+    if (busca === '') return true;
+    return (
+      retorno.nome_paciente?.toLowerCase().includes(busca) ||
+      retorno.telefone_paciente?.includes(busca) ||
+      retorno.telefone_responsavel?.includes(busca) ||
+      retorno.responsavel?.toLowerCase().includes(busca)
+    );
   });
 
   useEffect(() => {
@@ -108,12 +117,12 @@ const Dashboard = () => {
       if (sucesso && consultaParaCancelar.tipo === 'Retorno') {
         puxarRetornosDoBanco(); 
       }
-      
       setConsultaParaCancelar(null);
     } catch (error) {
       console.error("Erro ao cancelar consulta:", error);
     }
   };
+
   const handleToggleLembrete = (idConsulta, nomeUsuario) => {
     if (abaAtiva === 'consultas') {
       toggleLembrete(idConsulta, nomeUsuario);
@@ -147,6 +156,7 @@ const Dashboard = () => {
         setorSelecionado={setorSelecionado}
         onSetorChange={setSetorSelecionado}
         clinicas={clinicas}
+        busca={buscaTexto}
         onBuscarChange={setBuscaTexto}
       />
 
@@ -204,7 +214,7 @@ const Dashboard = () => {
               fontSize: '14px',
               fontWeight: '600',
               color: '#fff',
-              backgroundColor: '#10b981', // Um verde bonito para diferenciar do agendamento comum
+              backgroundColor: '#10b981',
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
@@ -216,8 +226,9 @@ const Dashboard = () => {
           </button>
         )}
       </div>
+
       <ConsultasTable
-        consultas={abaAtiva === 'consultas' ? consultasFiltradas : retornos} 
+        consultas={abaAtiva === 'consultas' ? consultasFiltradas : retornosFiltrados}
         abaAtiva={abaAtiva} 
         onToggleLembrete={handleToggleLembrete}
         onEditar={(c) => { setConsultaSelecionada(c); setIsModalEditarOpen(true); }}
@@ -256,8 +267,37 @@ const Dashboard = () => {
       {isModalClinicasOpen && <ModalGerenciarClinicas onClose={() => setIsModalClinicasOpen(false)} clinicas={clinicas} setClinicas={setClinicas} />}
       <ModalPerfil isOpen={isModalPerfilOpen} onClose={() => setIsModalPerfilOpen(false)} onLogout={() => navigate("/")} />
       {consultaParaCancelar && <ModalConfirmarCancelamento consulta={consultaParaCancelar} onClose={() => setConsultaParaCancelar(null)} onConfirm={confirmarCancelamento} />}
-      {isModalEditarOpen && consultaSelecionada && <ModalEditarConsulta onClose={() => { setIsModalEditarOpen(false); setConsultaSelecionada(null); }} onSave={async(editada) => { await salvarEdicao(consultaSelecionada, editada); setIsModalEditarOpen(false); setConsultaSelecionada(null); }} consulta={consultaSelecionada} clinicas={clinicas} />}
-      {isModalReagendarOpen && consultaSelecionada && <ModalReagendarConsulta onClose={() => { setIsModalReagendarOpen(false); setConsultaSelecionada(null); }} onSave={async(reagendada) => {await  salvarReagendamento(consultaSelecionada, reagendada); setIsModalReagendarOpen(false); setConsultaSelecionada(null); }} consulta={consultaSelecionada} />}
+      {isModalEditarOpen && consultaSelecionada && <ModalEditarConsulta onClose={() => { setIsModalEditarOpen(false); setConsultaSelecionada(null); }} onSave={async(editada) => { await salvarEdicao(consultaSelecionada, editada); await buscarConsultas(); await puxarRetornosDoBanco(); setIsModalEditarOpen(false); setConsultaSelecionada(null); }} consulta={consultaSelecionada} clinicas={clinicas} />}
+      
+      {isModalReagendarOpen && consultaSelecionada && (
+        <ModalReagendarConsulta 
+          onClose={() => { 
+            setIsModalReagendarOpen(false); 
+            setConsultaSelecionada(null); 
+          }} 
+          onSave={async (id, dadosReagendados) => {
+            // 🔥 LOGS PARA DEBUG 🔥
+            console.log('🔍 ===== DASHBOARD.onSave =====');
+            console.log('📝 ID recebido:', id);
+            console.log('📝 Dados recebidos:', dadosReagendados);
+            console.log('📝 Tipo do ID:', typeof id);
+            
+            const resultado = await salvarReagendamento(id, dadosReagendados);
+            
+            console.log('📥 Resultado do salvarReagendamento:', resultado);
+            
+            if (resultado) {
+              await buscarConsultas();
+              await puxarRetornosDoBanco();
+            }
+            
+            setIsModalReagendarOpen(false); 
+            setConsultaSelecionada(null); 
+          }} 
+          consulta={consultaSelecionada} 
+        />
+      )}
+      
       {isModalWhatsOpen && consultaWhatsApp && <ModalEscolherWhatsApp consulta={consultaWhatsApp} onClose={() => { setIsModalWhatsOpen(false); setConsultaWhatsApp(null); }} onConfirm={() => { setIsModalWhatsOpen(false); setConsultaWhatsApp(null); }} />}
     </div>
   );

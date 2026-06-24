@@ -59,18 +59,39 @@ exports.editarConsulta = async (req, res) => {
         const { id } = req.params;
         const atualizacoes = req.body;
 
-        const consultaAtualizada = await Agendamento.findByIdAndUpdate(id, atualizacoes, { new: true, runValidators: true });
+        // 🔥 LOGS PARA DEBUG 🔥
+        console.log('🔍 ===== EDITAR CONSULTA =====');
+        console.log('📝 ID recebido:', id);
+        console.log('📝 Dados recebidos:', JSON.stringify(atualizacoes, null, 2));
+        console.log('📝 Tipo do ID:', typeof id);
+
+        // Verifica se o ID é válido
+        if (!id || id === 'undefined' || id === 'null') {
+            console.log('❌ ID inválido!');
+            return res.status(400).json({ erro: "ID da consulta é obrigatório." });
+        }
+
+        const consultaAtualizada = await Agendamento.findByIdAndUpdate(
+            id, 
+            atualizacoes, 
+            { new: true, runValidators: true }
+        );
 
         if (!consultaAtualizada) {
+            console.log('❌ Consulta não encontrada para o ID:', id);
             return res.status(404).json({ erro: "Consulta não encontrada." });
         }
+
+        console.log('✅ Consulta atualizada com sucesso!');
+        console.log('📝 Dados atualizados:', JSON.stringify(consultaAtualizada, null, 2));
 
         res.status(200).json({
             message: "Consulta atualizada com sucesso!",
             agendamento: consultaAtualizada
         });
     } catch (error) {
-        console.error("Erro ao editar consulta:", error);
+        console.error("❌ Erro ao editar consulta:", error);
+        console.error("❌ Stack:", error.stack);
         res.status(500).json({ erro: "Erro ao editar consulta." });
     }
 };
