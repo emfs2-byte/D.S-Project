@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./components/login/Login";
+import Login from "./Components/Login/Login";
 import Dashboard from "./pages/Dashboard";
 import { ClinicasProvider } from "./contexts/ClinicasContext";
 

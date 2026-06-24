@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: '/NPI/api',   // sem fallback, sempre relativo
     withCredentials: true
 });
 
@@ -10,8 +10,7 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Sessão expirada ou inválida: redireciona para login
-            window.location.href = '/';
+            window.location.href = '/NPI/';
         }
         return Promise.reject(error);
     }

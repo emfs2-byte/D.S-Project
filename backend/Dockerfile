@@ -16,5 +16,5 @@ COPY . .
 # Expõe a porta 5000 que sua API usa
 EXPOSE 5000
 
-# Comando para iniciar o servidor 
-CMD ["npm", "run", "dev"]
+# Comando para iniciar o servidor em produção
+CMD ["node", "src/server.js"]
