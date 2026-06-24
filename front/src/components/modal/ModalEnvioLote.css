@@ -1,0 +1,74 @@
+/* Fundo escuro atrás do modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Caixa central do Modal */
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.modal-content h2 {
+  color: #0369a1;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.detalhes-paciente {
+  background-color: #f0f9ff;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
+  border: 1px solid #e0f2fe;
+}
+
+/* Botões do Modal */
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 25px;
+  gap: 15px;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.btn-cancelar {
+  background-color: #e2e8f0;
+  color: #475569;
+}
+
+.btn-cancelar:hover {
+  background-color: #cbd5e1;
+}
+
+.btn-enviar {
+  background-color: #0284c7;
+  color: white;
+}
+
+.btn-enviar:hover {
+  background-color: #0369a1;
+}
