@@ -1,26 +1,27 @@
 services:
-  nginx:
-    build:
-      context: .
-      dockerfile: nginx/Dockerfile
-    container_name: clinidesk-nginx
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-    networks:
-      - clinidesk-network
-    restart: unless-stopped
 
   backend:
     build:
       context: ./backend
-    container_name: clinidesk-backend
+    container_name: projeto-4-backend
     env_file:
       - ./backend/.env
     networks:
-      - clinidesk-network
+      - cin_proxy
     restart: unless-stopped
 
+  frontend:
+    build:
+      context: ./Front
+    container_name: projeto-4-frontend
+    volumes:
+      - /opt/docker/frontends/projeto4:/output
+    depends_on:
+      - backend
+    restart: "no"
+    networks:
+      - cin_proxy
+
 networks:
-  clinidesk-network:
+  cin_proxy:
+    external: true
