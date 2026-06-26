@@ -1,5 +1,5 @@
 import { LogOut, Settings, Plus } from 'lucide-react';
-import CliniDeskLogo from '../../../components/login/CliniDeskLogo';
+import CliniDeskLogo from '../../../Components/Login/CliniDeskLogo';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
