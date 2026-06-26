@@ -4,6 +4,8 @@ services:
     build:
       context: ./backend
     container_name: projeto-4-backend
+    ports:
+      - "5000:3004"
     env_file:
       - ./backend/.env
     networks:
