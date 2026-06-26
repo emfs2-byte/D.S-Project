@@ -6,8 +6,8 @@ import { ClinicasProvider } from "./contexts/ClinicasContext";
 function App() {
   return (
     <ClinicasProvider>
-      {/* O basename avisa ao React que o site está rodando dentro da pasta /NPI */}
-      <Router basename="/NPI">
+      {/* O basename avisa ao React que o site está rodando dentro da pasta /npi */}
+      <Router basename="/npi">
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/home" element={<Dashboard />} />
