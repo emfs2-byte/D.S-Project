@@ -22,6 +22,12 @@ Projetado como um MVP para o **Núcleo da Pessoa Idosa (NPI)**, o CliniDesk unif
 
 ---
 
+## 🎥 Demonstração em Vídeo
+
+[![Assista ao CliniDesk em ação](https://img.youtube.com/vi/umnE3N6IhpY/maxresdefault.jpg)](https://youtu.be/umnE3N6IhpY)
+
+---
+
 ## 🚀 Funcionalidades Principais
 
 - **📅 Agendamento Setorial Customizado** — Cadastro completo de pacientes com dados vitais (telefones do paciente e responsável), por setor: Geriatria, Fisioterapia, Assistência Social, Nutrição e Psicologia.
