@@ -171,15 +171,15 @@ npm run dev
 
 Crie `./backend/.env` baseado no `.env.example`:
 
-```env
+```text
+PORT=5000
 MONGO_URI=mongodb+srv://<usuario>:<senha>@cluster.mongodb.net/clinidesk
 JWT_SECRET=sua_chave_secreta_aqui
-PORT=5000
-```
 
-O frontend recebe apenas:
-```env
-VITE_API_URL=http://localhost:5000
+# URL do Frontend autorizada a consumir esta API (Configuração de CORS)
+FRONTEND_URL=[https://clinicasdigitais.cin.ufpe.br](https://clinicasdigitais.cin.ufpe.br)
+
+VITE_API_URL=/NPI/api
 ```
 
 > ⚠️ Nunca suba o `.env` para o repositório. Ele já está no `.gitignore`.
